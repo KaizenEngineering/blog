@@ -99,13 +99,31 @@ ul.task-list li input[type="checkbox"] {
   })
   </script>
 <script>
-    function goToAnnotation(elt) {
-      annotationId = elt.href.split('#')[1];
-      a = document.getElementById(annotationId);
-      a.click()
-      a.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      event.preventDefault();
-    }
+  if (!Element.prototype.scrollIntoViewIfNeeded) {
+    Element.prototype.scrollIntoViewIfNeeded = function (centerIfNeeded = true) {
+      const el = this;
+      new IntersectionObserver(function ([entry]) {
+        const ratio = entry.intersectionRatio;
+        if (ratio < 1) {
+          let place = ratio <= 0 && centerIfNeeded ? 'center' : 'nearest';
+          el.scrollIntoView({
+            behavior: "smooth",
+            block: place,
+            inline: place,
+          });
+        }
+        this.disconnect();
+      }).observe(this);
+    };
+  }
+
+  function goToAnnotation(elt) {
+    annotationId = elt.href.split('#')[1];
+    a = document.getElementById(annotationId);
+    a.click()
+    a.scrollIntoViewIfNeeded(false)
+    event.preventDefault();
+  }
 </script>
 
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -313,7 +331,7 @@ Alan Horne
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="3" data-categories="functions,methods,overloading" data-listing-date-sort="1692815580000" data-listing-file-modified-sort="1706430923751" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1488">
+<div class="quarto-post image-right" data-index="3" data-categories="functions,methods,overloading" data-listing-date-sort="1692815580000" data-listing-file-modified-sort="1706436535461" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1488">
 <div class="thumbnail">
 <p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt1/index.html"></a></p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt1/index.html">
 <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
@@ -356,7 +374,7 @@ Kaizen Engineering
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="4" data-categories="functions,methods,overloading" data-listing-date-sort="1692815580000" data-listing-file-modified-sort="1705673913658" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="246">
+<div class="quarto-post image-right" data-index="4" data-categories="functions,methods,overloading" data-listing-date-sort="1692815580000" data-listing-file-modified-sort="1706436429451" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="246">
 <div class="thumbnail">
 <p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt2/index.html"></a></p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt2/index.html">
 <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>

@@ -104,13 +104,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <script>
-    function goToAnnotation(elt) {
-      annotationId = elt.href.split('#')[1];
-      a = document.getElementById(annotationId);
-      a.click()
-      a.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      event.preventDefault();
-    }
+  if (!Element.prototype.scrollIntoViewIfNeeded) {
+    Element.prototype.scrollIntoViewIfNeeded = function (centerIfNeeded = true) {
+      const el = this;
+      new IntersectionObserver(function ([entry]) {
+        const ratio = entry.intersectionRatio;
+        if (ratio < 1) {
+          let place = ratio <= 0 && centerIfNeeded ? 'center' : 'nearest';
+          el.scrollIntoView({
+            behavior: "smooth",
+            block: place,
+            inline: place,
+          });
+        }
+        this.disconnect();
+      }).observe(this);
+    };
+  }
+
+  function goToAnnotation(elt) {
+    annotationId = elt.href.split('#')[1];
+    a = document.getElementById(annotationId);
+    a.click()
+    a.scrollIntoViewIfNeeded(false)
+    event.preventDefault();
+  }
 </script>
 
 
