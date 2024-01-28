@@ -254,9 +254,9 @@ Semantically inconsistent overloading
 <div id="cell-6" class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode mojo code-with-copy"><code class="sourceCode mojosyntax"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> StringList:</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Removes all strings</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> remove(inout <span class="va">self</span>): ...</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> remove(<span class="bu">inout</span> <span class="va">self</span>): ...</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Removes all strings for which `predicate` is true and returns them in `removed`</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> remove(inout <span class="va">self</span>, predicate: <span class="kw">fn</span> (String) <span class="op">-&gt;</span> Bool, inout removed: StringList): ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> remove(<span class="bu">inout</span> <span class="va">self</span>, predicate: <span class="kw">fn</span> (String) <span class="op">-&gt;</span> Bool, <span class="bu">inout</span> removed: StringList): ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The meanings of these functions are different, however. Overload 1 throws out all contained strings, while Overload 2 effectively splits the contents, storing one subset in the <code>removed</code> parameter.</p>
 </div>
@@ -276,16 +276,16 @@ Meaningful unique names
 <div id="cell-9" class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode mojo code-with-copy"><code class="sourceCode mojosyntax"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> StringList:</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create empty list</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> <span class="fu">__init__</span>(inout <span class="va">self</span>): ...                    <span class="co"># Overload 1</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> <span class="fu">__init__</span>(<span class="bu">inout</span> <span class="va">self</span>): ...                    <span class="co"># Overload 1</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>   </span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create list copied from `source`</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> __copyinit__(inout <span class="va">self</span>, source: Self): ...  <span class="co"># Overload 2</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> __copyinit__(<span class="bu">inout</span> <span class="va">self</span>, source: Self): ...  <span class="co"># Overload 2</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Removes all strings</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> clear(inout <span class="va">self</span>): ...</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> clear(<span class="bu">inout</span> <span class="va">self</span>): ...</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>   </span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Removes all strings for which predicate is true and returns them</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> remove(inout <span class="va">self</span>, predicate: <span class="kw">fn</span> (String) <span class="op">-&gt;</span> Bool) <span class="op">-&gt;</span> StringList:</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> remove(<span class="bu">inout</span> <span class="va">self</span>, predicate: <span class="kw">fn</span> (String) <span class="op">-&gt;</span> Bool) <span class="op">-&gt;</span> StringList:</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> StringList()                       <span class="co"># Placeholder to satisfy compiler</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>When the client uses <code>remove</code>, it receives a StringList object as a return value. This is simpler for the client programmer than the first version that required creation of a mutable StringList object to serve as the argument for the <code>removed</code> parameter. Further, the unqualified removal of all stored strings is better captured by the name <code>clear</code>.</p>
@@ -310,9 +310,9 @@ Unhelpful parameter names
 <p>This code declares three overloads of <code>insert</code>. The documentation is omitted on purpose to put focus on the parameter lists.</p>
 <div id="cell-12" class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode mojo code-with-copy"><code class="sourceCode mojosyntax"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> StringList:</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(inout <span class="va">self</span>, idx: Int, e: String): ...</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(inout <span class="va">self</span>, idx: Int, l: StringList): ...</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(inout <span class="va">self</span>, idx: Int, l: StringList, sidx: Int, eidx: Int): ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(<span class="bu">inout</span> <span class="va">self</span>, idx: Int, e: String): ...</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(<span class="bu">inout</span> <span class="va">self</span>, idx: Int, l: StringList): ...</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(<span class="bu">inout</span> <span class="va">self</span>, idx: Int, l: StringList, sidx: Int, eidx: Int): ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Discerning the purpose of these functions takes guesswork, especially without leaning on the parameter types.</p>
 </div>
@@ -330,9 +330,9 @@ Meaningful parameter names
 <p>In this version, the parameter names aspire to clarify the meaning of each overload of <code>insert</code>.</p>
 <div id="cell-15" class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode mojo code-with-copy"><code class="sourceCode mojosyntax"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> StringList:</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(inout <span class="va">self</span>, at_index: Int, element: String): ...</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(inout <span class="va">self</span>, at_index: Int, elements: StringList): ...</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(inout <span class="va">self</span>, at_index: Int, elements: StringList, start_index: Int, end_index: Int): ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(<span class="bu">inout</span> <span class="va">self</span>, at_index: Int, element: String): ...</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(<span class="bu">inout</span> <span class="va">self</span>, at_index: Int, elements: StringList): ...</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(<span class="bu">inout</span> <span class="va">self</span>, at_index: Int, elements: StringList, start_index: Int, end_index: Int): ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>These parameter names are made of full words, instead of abbreviations, and leave less to assumption. For example, <code>at_index</code> reads well in <em>insert at index</em>.</p>
 </div>
@@ -367,14 +367,14 @@ Inconsistent reuse of parameters across overloads
 <div id="cell-21" class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode mojo code-with-copy"><code class="sourceCode mojosyntax"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> StringList:</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create empty list</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> <span class="fu">__init__</span>(inout <span class="va">self</span>): ...</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> <span class="fu">__init__</span>(<span class="bu">inout</span> <span class="va">self</span>): ...</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Insert `element` at end of list </span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(inout <span class="va">self</span>, element: String): ...                         <span class="co"># Overload 1</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(<span class="bu">inout</span> <span class="va">self</span>, element: String): ...                         <span class="co"># Overload 1</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Insert `element` at `index` </span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(inout <span class="va">self</span>, element: String, index: Int): ...             <span class="co"># Overload 2</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(<span class="bu">inout</span> <span class="va">self</span>, element: String, index: Int): ...             <span class="co"># Overload 2</span></span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Insert `count` copies of `element` at `index`</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(inout <span class="va">self</span>, element: String, count: Int, index: Int): ... <span class="co"># Overload 3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(<span class="bu">inout</span> <span class="va">self</span>, element: String, count: Int, index: Int): ... <span class="co"># Overload 3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -392,14 +392,14 @@ Consistent reuse of parameters across overloads
 <div id="cell-24" class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode mojo code-with-copy"><code class="sourceCode mojosyntax"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> StringList:</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create empty list</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> <span class="fu">__init__</span>(inout <span class="va">self</span>): ...</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> <span class="fu">__init__</span>(<span class="bu">inout</span> <span class="va">self</span>): ...</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Insert `element` at end of list </span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(inout <span class="va">self</span>, element: String): ...                         <span class="co"># Overload 1</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(<span class="bu">inout</span> <span class="va">self</span>, element: String): ...                         <span class="co"># Overload 1</span></span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Insert `element` at `index` </span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(inout <span class="va">self</span>, element: String, index: Int): ...             <span class="co"># Overload 2</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(<span class="bu">inout</span> <span class="va">self</span>, element: String, index: Int): ...             <span class="co"># Overload 2</span></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Insert `count` copies of `element` at `index`</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(inout <span class="va">self</span>, element: String, index: Int, count: Int): ... <span class="co"># Overload 3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(<span class="bu">inout</span> <span class="va">self</span>, element: String, index: Int, count: Int): ... <span class="co"># Overload 3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This version maintains the same position for the <code>index</code> parameter across Overload 2 and Overload 3. The consistency enables the client programmer to employ and transition between the overloads with reduced likelihood of misstepping.</p>
 </div>

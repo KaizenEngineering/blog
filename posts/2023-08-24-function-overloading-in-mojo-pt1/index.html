@@ -248,23 +248,23 @@ A note on code examples
 <section id="argument-signature-overloading" class="level1 page-columns page-full">
 <h1>Argument signature overloading</h1>
 <p>Consider a struct representing a list of strings: <!--# Simple example to crystalize and hook the reader.--></p>
-<div id="cell-4" class="cell" data-execution_count="1">
+<div id="cell-4" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="lst_example"><pre class="sourceCode mojo code-annotation-code code-with-copy code-annotated"><code class="sourceCode mojosyntax"><span id="lst_example-1"><a href="#lst_example-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> StringList:</span>
 <span id="lst_example-2"><a href="#lst_example-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create empty list</span></span>
-<span id="lst_example-3"><a href="#lst_example-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> <span class="fu">__init__</span>(inout <span class="va">self</span>): ...</span>
+<span id="lst_example-3"><a href="#lst_example-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> <span class="fu">__init__</span>(<span class="bu">inout</span> <span class="va">self</span>): ...</span>
 <span id="lst_example-4"><a href="#lst_example-4" aria-hidden="true" tabindex="-1"></a></span>
 <button id="lst_example-a1" class="code-annotation-anchor" data-target-cell="lst_example" data-target-annotation="1">1</button><span id="lst_example-5" class="code-annotation-target"><a href="#lst_example-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Overload 1</span></span>
 <span id="lst_example-6"><a href="#lst_example-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Insert `element` at end of list </span></span>
-<span id="lst_example-7"><a href="#lst_example-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(inout <span class="va">self</span>, element: String):</span>
+<span id="lst_example-7"><a href="#lst_example-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(<span class="bu">inout</span> <span class="va">self</span>, element: String):</span>
 <span id="lst_example-8"><a href="#lst_example-8" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"In Overload 1"</span>)</span>
 <button id="lst_example-a2" class="code-annotation-anchor" data-target-cell="lst_example" data-target-annotation="2">2</button><span id="lst_example-9" class="code-annotation-target"><a href="#lst_example-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Overload 2</span></span>
 <span id="lst_example-10"><a href="#lst_example-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Insert `element` at `index`. Raises exception if `index` is outside [0, len],</span></span>
 <span id="lst_example-11"><a href="#lst_example-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># where len is current length of this `StringList`</span></span>
-<span id="lst_example-12"><a href="#lst_example-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(inout <span class="va">self</span>, element: String, index: Int):</span>
+<span id="lst_example-12"><a href="#lst_example-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(<span class="bu">inout</span> <span class="va">self</span>, element: String, index: Int):</span>
 <span id="lst_example-13"><a href="#lst_example-13" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"In Overload 2"</span>)</span>
 <button id="lst_example-a3" class="code-annotation-anchor" data-target-cell="lst_example" data-target-annotation="3">3</button><span id="lst_example-14" class="code-annotation-target"><a href="#lst_example-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Overload 3</span></span>
 <span id="lst_example-15"><a href="#lst_example-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Insert all `elements` at end of list</span></span>
-<span id="lst_example-16"><a href="#lst_example-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(inout <span class="va">self</span>, elements: StringList):        </span>
+<span id="lst_example-16"><a href="#lst_example-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> insert(<span class="bu">inout</span> <span class="va">self</span>, elements: StringList):        </span>
 <span id="lst_example-17"><a href="#lst_example-17" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"In Overload 3"</span>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-annotation">
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
@@ -287,9 +287,9 @@ A note on code examples
 <section id="call-resolution" class="level2">
 <h2 class="anchored" data-anchor-id="call-resolution">Call resolution</h2>
 <p>The Mojo compiler resolves the call at invocation site, selecting one of the overloads based on the argument list. Let’s examine the output of executing the <code>insert</code> call in this code:</p>
-<div id="cell-7" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="lst_call_resolution_1"><pre class="sourceCode mojo code-annotation-code code-with-copy code-annotated"><code class="sourceCode mojosyntax"><span id="lst_call_resolution_1-1"><a href="#lst_call_resolution_1-1" aria-hidden="true" tabindex="-1"></a>var tasks: StringList <span class="op">=</span> StringList()</span>
-<span id="lst_call_resolution_1-2"><a href="#lst_call_resolution_1-2" aria-hidden="true" tabindex="-1"></a>let task1: String <span class="op">=</span> String(<span class="st">"Review proposed design"</span>)</span>
+<div id="cell-7" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="lst_call_resolution_1"><pre class="sourceCode mojo code-annotation-code code-with-copy code-annotated"><code class="sourceCode mojosyntax"><span id="lst_call_resolution_1-1"><a href="#lst_call_resolution_1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> tasks: StringList <span class="op">=</span> StringList()</span>
+<span id="lst_call_resolution_1-2"><a href="#lst_call_resolution_1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> task1: String <span class="op">=</span> String(<span class="st">"Review proposed design"</span>)</span>
 <span id="lst_call_resolution_1-3"><a href="#lst_call_resolution_1-3" aria-hidden="true" tabindex="-1"></a></span>
 <button id="lst_call_resolution_1-a1" class="code-annotation-anchor" data-target-cell="lst_call_resolution_1" data-target-annotation="1">1</button><span id="lst_call_resolution_1-4" class="code-annotation-target"><a href="#lst_call_resolution_1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Call Site A</span></span>
 <span id="lst_call_resolution_1-5"><a href="#lst_call_resolution_1-5" aria-hidden="true" tabindex="-1"></a>tasks.insert(task1)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -309,7 +309,7 @@ A note on code examples
 <p>At <a href="#lst_call_resolution_1-a1" onclick="goToAnnotation(this)">Call Site A</a>, <code>insert</code> is invoked with two values. The first is the implicit value <code>tasks</code> of type <code>StringList</code> and the second is the explicit value <code>task1</code> of type <code>String</code>. Based on the number of values, both <a href="#lst_example-a1" onclick="goToAnnotation(this)">Overload 1</a> and <a href="#lst_example-a2" onclick="goToAnnotation(this)">Overload 2</a> are candidates. Among these two, only <a href="#lst_example-a1" onclick="goToAnnotation(this)">Overload 1</a> matches the argument types. Consequently, the compiler resolved the call at <a href="#lst_call_resolution_1-a1" onclick="goToAnnotation(this)">Call Site A</a> to <a href="#lst_example-a1" onclick="goToAnnotation(this)">Overload 1</a>.</p>
 <hr>
 <p>Let’s take a look at another example:</p>
-<div id="cell-9" class="cell" data-execution_count="3">
+<div id="cell-9" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="lst_call_resolution_2"><pre class="sourceCode mojo code-annotation-code code-with-copy code-annotated"><code class="sourceCode mojosyntax"><button id="lst_call_resolution_2-a1" class="code-annotation-anchor" data-target-cell="lst_call_resolution_2" data-target-annotation="1">1</button><span id="lst_call_resolution_2-1" class="code-annotation-target"><a href="#lst_call_resolution_2-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># Call Site B</span></span>
 <span id="lst_call_resolution_2-2"><a href="#lst_call_resolution_2-2" aria-hidden="true" tabindex="-1"></a>tasks.insert(task1, <span class="dv">0</span>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-annotation">
@@ -329,7 +329,7 @@ A note on code examples
 <section id="no-overloading-on-result-type" class="level2">
 <h2 class="anchored" data-anchor-id="no-overloading-on-result-type">No overloading on result type</h2>
 <p>Mojo functions cannot be overloaded on result type alone. Let’s look at what happens when this struct declaration is compiled:</p>
-<div id="cell-12" class="cell" data-execution_count="4">
+<div id="cell-12" class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="lst_no_overloading_on_return_type"><pre class="sourceCode mojo code-annotation-code code-with-copy code-annotated"><code class="sourceCode mojosyntax"><span id="lst_no_overloading_on_return_type-1"><a href="#lst_no_overloading_on_return_type-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> StringList:</span>
 <button id="lst_no_overloading_on_return_type-a1" class="code-annotation-anchor" data-target-cell="lst_no_overloading_on_return_type" data-target-annotation="1">1</button><span id="lst_no_overloading_on_return_type-2" class="code-annotation-target"><a href="#lst_no_overloading_on_return_type-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Overload 1</span></span>
 <span id="lst_no_overloading_on_return_type-3"><a href="#lst_no_overloading_on_return_type-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Count all items</span></span>
@@ -350,11 +350,11 @@ A note on code examples
 </dl>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>error: Expression [4]:8:5: redefinition of function 'count' cannot overload on return type only
+<pre><code>error: Expression [24]:8:5: redefinition of function 'count' cannot overload on return type only
     fn count(self) -&gt; UInt64: ...   # &lt;2&gt;
     ^
 
-Expression [4]:5:5: previous definition here
+Expression [24]:5:5: previous definition here
     fn count(self) -&gt; UInt32: ...   # &lt;1&gt;
     ^
 
@@ -366,20 +366,20 @@ expression failed to parse (no further compiler diagnostics)</code></pre>
 <section id="overloaded-constructors" class="level2">
 <h2 class="anchored" data-anchor-id="overloaded-constructors">Overloaded constructors</h2>
 <p>Mojo allows constructors to be overloaded as well. For example:</p>
-<div id="cell-15" class="cell" data-execution_count="5">
+<div id="cell-15" class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="lst_constructor_overloading"><pre class="sourceCode mojo code-annotation-code code-with-copy code-annotated"><code class="sourceCode mojosyntax"><span id="lst_constructor_overloading-1"><a href="#lst_constructor_overloading-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> StringList:</span>
 <button id="lst_constructor_overloading-a1" class="code-annotation-anchor" data-target-cell="lst_constructor_overloading" data-target-annotation="1">1</button><span id="lst_constructor_overloading-2" class="code-annotation-target"><a href="#lst_constructor_overloading-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Overload 1</span></span>
 <span id="lst_constructor_overloading-3"><a href="#lst_constructor_overloading-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create empty list</span></span>
-<span id="lst_constructor_overloading-4"><a href="#lst_constructor_overloading-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> <span class="fu">__init__</span>(inout <span class="va">self</span>):</span>
+<span id="lst_constructor_overloading-4"><a href="#lst_constructor_overloading-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> <span class="fu">__init__</span>(<span class="bu">inout</span> <span class="va">self</span>):</span>
 <span id="lst_constructor_overloading-5"><a href="#lst_constructor_overloading-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"In Overload 1"</span>)</span>
 <button id="lst_constructor_overloading-a2" class="code-annotation-anchor" data-target-cell="lst_constructor_overloading" data-target-annotation="2">2</button><span id="lst_constructor_overloading-6" class="code-annotation-target"><a href="#lst_constructor_overloading-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Overload 2</span></span>
 <span id="lst_constructor_overloading-7"><a href="#lst_constructor_overloading-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create list initialized with `count` number of copies of `element`</span></span>
-<span id="lst_constructor_overloading-8"><a href="#lst_constructor_overloading-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> <span class="fu">__init__</span>(inout <span class="va">self</span>, element: String, count: Int):</span>
+<span id="lst_constructor_overloading-8"><a href="#lst_constructor_overloading-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> <span class="fu">__init__</span>(<span class="bu">inout</span> <span class="va">self</span>, element: String, count: Int):</span>
 <span id="lst_constructor_overloading-9"><a href="#lst_constructor_overloading-9" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"In Overload 2"</span>)</span>
 <button id="lst_constructor_overloading-a3" class="code-annotation-anchor" data-target-cell="lst_constructor_overloading" data-target-annotation="3">3</button><span id="lst_constructor_overloading-10" class="code-annotation-target"><a href="#lst_constructor_overloading-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Overload 3</span></span>
 <span id="lst_constructor_overloading-11"><a href="#lst_constructor_overloading-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create list initialized with strings from `elements` between `start_index` and    </span></span>
 <span id="lst_constructor_overloading-12"><a href="#lst_constructor_overloading-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># `end_index`</span></span>
-<span id="lst_constructor_overloading-13"><a href="#lst_constructor_overloading-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> <span class="fu">__init__</span>(inout <span class="va">self</span>, elements: StringList, start_index: Int, end_index: Int):</span>
+<span id="lst_constructor_overloading-13"><a href="#lst_constructor_overloading-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> <span class="fu">__init__</span>(<span class="bu">inout</span> <span class="va">self</span>, elements: StringList, start_index: Int, end_index: Int):</span>
 <span id="lst_constructor_overloading-14"><a href="#lst_constructor_overloading-14" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"In Overload 3"</span>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-annotation">
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
@@ -400,13 +400,13 @@ expression failed to parse (no further compiler diagnostics)</code></pre>
 </div>
 <p>The argument lists of the three overloads differ by count or types, in keeping with Mojo’s overloading rules.</p>
 <p>Here are invocations of each of them:</p>
-<div id="cell-17" class="cell" data-execution_count="6">
+<div id="cell-17" class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="lst_constructor_resolution"><pre class="sourceCode mojo code-annotation-code code-with-copy code-annotated"><code class="sourceCode mojosyntax"><button id="lst_constructor_resolution-a1" class="code-annotation-anchor" data-target-cell="lst_constructor_resolution" data-target-annotation="1">1</button><span id="lst_constructor_resolution-1" class="code-annotation-target"><a href="#lst_constructor_resolution-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Call Site A</span></span>
-<span id="lst_constructor_resolution-2"><a href="#lst_constructor_resolution-2" aria-hidden="true" tabindex="-1"></a>let names <span class="op">=</span> StringList()</span>
+<span id="lst_constructor_resolution-2"><a href="#lst_constructor_resolution-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> names <span class="op">=</span> StringList()</span>
 <button id="lst_constructor_resolution-a2" class="code-annotation-anchor" data-target-cell="lst_constructor_resolution" data-target-annotation="2">2</button><span id="lst_constructor_resolution-3" class="code-annotation-target"><a href="#lst_constructor_resolution-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Call Site B</span></span>
-<span id="lst_constructor_resolution-4"><a href="#lst_constructor_resolution-4" aria-hidden="true" tabindex="-1"></a>let statuses <span class="op">=</span> StringList(<span class="st">"Pending"</span>, <span class="dv">3</span>)</span>
+<span id="lst_constructor_resolution-4"><a href="#lst_constructor_resolution-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> statuses <span class="op">=</span> StringList(<span class="st">"Pending"</span>, <span class="dv">3</span>)</span>
 <button id="lst_constructor_resolution-a3" class="code-annotation-anchor" data-target-cell="lst_constructor_resolution" data-target-annotation="3">3</button><span id="lst_constructor_resolution-5" class="code-annotation-target"><a href="#lst_constructor_resolution-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Call Site C</span></span>
-<span id="lst_constructor_resolution-6"><a href="#lst_constructor_resolution-6" aria-hidden="true" tabindex="-1"></a>let copied_statuses <span class="op">=</span> StringList(statuses, <span class="dv">1</span>, <span class="dv">3</span>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="lst_constructor_resolution-6"><a href="#lst_constructor_resolution-6" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> copied_statuses <span class="op">=</span> StringList(statuses, <span class="dv">1</span>, <span class="dv">3</span>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-annotation">
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
 <dt data-target-cell="lst_constructor_resolution" data-target-annotation="1">1</dt>
@@ -435,18 +435,18 @@ In Overload 3</code></pre>
 <h2 class="anchored" data-anchor-id="parameterized-functions">Parameterized functions</h2>
 <p>When invoked with different types, a parameterized function effectively generates overloads with a shared function name.</p>
 <p>Consider the simple parameterized <code>swap</code> function below that exchanges the referenced values:</p>
-<div id="cell-20" class="cell" data-execution_count="7">
+<div id="cell-20" class="cell" data-execution_count="27">
 <div class="sourceCode cell-code" id="lst_swap_function"><pre class="sourceCode mojo code-with-copy"><code class="sourceCode mojosyntax"><span id="lst_swap_function-1"><a href="#lst_swap_function-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Swap the values of `value1` and `value2`</span></span>
-<span id="lst_swap_function-2"><a href="#lst_swap_function-2" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> swap[valueType: Copyable](inout value1: valueType, inout value2: valueType):</span>
-<span id="lst_swap_function-3"><a href="#lst_swap_function-3" aria-hidden="true" tabindex="-1"></a>    let temp <span class="op">=</span> value1</span>
+<span id="lst_swap_function-2"><a href="#lst_swap_function-2" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> swap[valueType: Copyable](<span class="bu">inout</span> value1: valueType, <span class="bu">inout</span> value2: valueType):</span>
+<span id="lst_swap_function-3"><a href="#lst_swap_function-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> temp <span class="op">=</span> value1</span>
 <span id="lst_swap_function-4"><a href="#lst_swap_function-4" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="lst_swap_function-5"><a href="#lst_swap_function-5" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> value2</span>
 <span id="lst_swap_function-6"><a href="#lst_swap_function-6" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> temp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The compiler instantiates a function based on the type of arguments. Here’s an example with <code>Int</code> values:</p>
-<div id="cell-22" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="lst_swap_integers"><pre class="sourceCode mojo code-annotation-code code-with-copy"><code class="sourceCode mojosyntax"><span id="lst_swap_integers-1"><a href="#lst_swap_integers-1" aria-hidden="true" tabindex="-1"></a>var i1 <span class="op">=</span> <span class="dv">2</span></span>
-<span id="lst_swap_integers-2"><a href="#lst_swap_integers-2" aria-hidden="true" tabindex="-1"></a>var i2 <span class="op">=</span> <span class="dv">3</span></span>
+<div id="cell-22" class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="lst_swap_integers"><pre class="sourceCode mojo code-annotation-code code-with-copy"><code class="sourceCode mojosyntax"><span id="lst_swap_integers-1"><a href="#lst_swap_integers-1" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> i1 <span class="op">=</span> <span class="dv">2</span></span>
+<span id="lst_swap_integers-2"><a href="#lst_swap_integers-2" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> i2 <span class="op">=</span> <span class="dv">3</span></span>
 <span id="lst_swap_integers-3"><a href="#lst_swap_integers-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="lst_swap_integers-4"><a href="#lst_swap_integers-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Before swap:"</span>, i1, i2)</span>
 <span id="lst_swap_integers-5"><a href="#lst_swap_integers-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Call Site A</span></span>
@@ -459,9 +459,9 @@ After swap: 3 2</code></pre>
 </div>
 <p><br>
 And now we use the same parameterized function with <code>String</code>:</p>
-<div id="cell-24" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="lst_swap_strings"><pre class="sourceCode mojo code-annotation-code code-with-copy"><code class="sourceCode mojosyntax"><span id="lst_swap_strings-1"><a href="#lst_swap_strings-1" aria-hidden="true" tabindex="-1"></a>var s1 <span class="op">=</span> <span class="st">"Mojo"</span></span>
-<span id="lst_swap_strings-2"><a href="#lst_swap_strings-2" aria-hidden="true" tabindex="-1"></a>var s2 <span class="op">=</span> <span class="st">"Programming"</span></span>
+<div id="cell-24" class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="lst_swap_strings"><pre class="sourceCode mojo code-annotation-code code-with-copy"><code class="sourceCode mojosyntax"><span id="lst_swap_strings-1"><a href="#lst_swap_strings-1" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> s1 <span class="op">=</span> <span class="st">"Mojo"</span></span>
+<span id="lst_swap_strings-2"><a href="#lst_swap_strings-2" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> s2 <span class="op">=</span> <span class="st">"Programming"</span></span>
 <span id="lst_swap_strings-3"><a href="#lst_swap_strings-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="lst_swap_strings-4"><a href="#lst_swap_strings-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Before swap:"</span>, s1, s2)</span>
 <span id="lst_swap_strings-5"><a href="#lst_swap_strings-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Call Site B</span></span>
@@ -484,17 +484,17 @@ Explicit parameter specification
 </div>
 <div class="callout-body-container callout-body">
 <p>Note that in <code>swap</code> invocations at <a href="#lst_swap_integers-a1" onclick="goToAnnotation(this)">Call Site A</a> and <a href="#lst_swap_strings-a1" onclick="goToAnnotation(this)">Call Site B</a> we relied on the compiler to determine the <code>valueType</code> parameter. An alternative is to spell out the parameter as shown below:</p>
-<div id="cell-26" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="lst_explicit_parameter_swap_invocation"><pre class="sourceCode mojo code-with-copy"><code class="sourceCode mojosyntax"><span id="lst_explicit_parameter_swap_invocation-1"><a href="#lst_explicit_parameter_swap_invocation-1" aria-hidden="true" tabindex="-1"></a>var i1 <span class="op">=</span> <span class="dv">2</span></span>
-<span id="lst_explicit_parameter_swap_invocation-2"><a href="#lst_explicit_parameter_swap_invocation-2" aria-hidden="true" tabindex="-1"></a>var i2 <span class="op">=</span> <span class="dv">3</span></span>
+<div id="cell-26" class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="lst_explicit_parameter_swap_invocation"><pre class="sourceCode mojo code-with-copy"><code class="sourceCode mojosyntax"><span id="lst_explicit_parameter_swap_invocation-1"><a href="#lst_explicit_parameter_swap_invocation-1" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> i1 <span class="op">=</span> <span class="dv">2</span></span>
+<span id="lst_explicit_parameter_swap_invocation-2"><a href="#lst_explicit_parameter_swap_invocation-2" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> i2 <span class="op">=</span> <span class="dv">3</span></span>
 <span id="lst_explicit_parameter_swap_invocation-3"><a href="#lst_explicit_parameter_swap_invocation-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="lst_explicit_parameter_swap_invocation-4"><a href="#lst_explicit_parameter_swap_invocation-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Before swap:"</span>, i1, i2)</span>
 <span id="lst_explicit_parameter_swap_invocation-5"><a href="#lst_explicit_parameter_swap_invocation-5" aria-hidden="true" tabindex="-1"></a>swap[Int](i1, i2)</span>
 <span id="lst_explicit_parameter_swap_invocation-6"><a href="#lst_explicit_parameter_swap_invocation-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"After swap:"</span>, i1, i2)</span>
 <span id="lst_explicit_parameter_swap_invocation-7"><a href="#lst_explicit_parameter_swap_invocation-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="lst_explicit_parameter_swap_invocation-8"><a href="#lst_explicit_parameter_swap_invocation-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="lst_explicit_parameter_swap_invocation-9"><a href="#lst_explicit_parameter_swap_invocation-9" aria-hidden="true" tabindex="-1"></a>var s1 <span class="op">=</span> <span class="st">"Mojo"</span></span>
-<span id="lst_explicit_parameter_swap_invocation-10"><a href="#lst_explicit_parameter_swap_invocation-10" aria-hidden="true" tabindex="-1"></a>var s2 <span class="op">=</span> <span class="st">"Programming"</span></span>
+<span id="lst_explicit_parameter_swap_invocation-9"><a href="#lst_explicit_parameter_swap_invocation-9" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> s1 <span class="op">=</span> <span class="st">"Mojo"</span></span>
+<span id="lst_explicit_parameter_swap_invocation-10"><a href="#lst_explicit_parameter_swap_invocation-10" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> s2 <span class="op">=</span> <span class="st">"Programming"</span></span>
 <span id="lst_explicit_parameter_swap_invocation-11"><a href="#lst_explicit_parameter_swap_invocation-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="lst_explicit_parameter_swap_invocation-12"><a href="#lst_explicit_parameter_swap_invocation-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Before swap:"</span>, s1, s2)</span>
 <span id="lst_explicit_parameter_swap_invocation-13"><a href="#lst_explicit_parameter_swap_invocation-13" aria-hidden="true" tabindex="-1"></a>swap[StringLiteral](s1, s2)</span>
@@ -514,7 +514,7 @@ After swap: Programming Mojo</code></pre>
 <p>Mojo functions can also be overloaded on parameter signatures. The parameters of the overloads just need to differ in type or arity.</p>
 <p>Take a look at this <code>StringUtils</code> struct with <code>format</code> functions overloaded via parameter signatures. They are a rudimentary version of string formatting functions found in other languages such as Python and C++.</p>
 <p>Each overload takes the same logical arguments. It uses the <code>format_str</code> argument as a template, and replaces each occurrence of substring “{}” by the remaining arguments in order, converted to strings.</p>
-<div id="cell-29" class="cell" data-execution_count="11">
+<div id="cell-29" class="cell" data-execution_count="60">
 <div class="sourceCode cell-code" id="lst_parameter_example_1"><pre class="sourceCode mojo code-annotation-code code-with-copy code-annotated"><code class="sourceCode mojosyntax"><span id="lst_parameter_example_1-1"><a href="#lst_parameter_example_1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> StringUtils:    </span>
 <span id="lst_parameter_example_1-2"><a href="#lst_parameter_example_1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Each overload of `format` returns a copy of the `format_str` with an  occurrence </span></span>
 <span id="lst_parameter_example_1-3"><a href="#lst_parameter_example_1-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># of substring "{}" replaced by the remaining argument, converted to strings.</span></span>
@@ -532,7 +532,7 @@ After swap: Programming Mojo</code></pre>
 <span id="lst_parameter_example_1-15"><a href="#lst_parameter_example_1-15" aria-hidden="true" tabindex="-1"></a>    ](</span>
 <span id="lst_parameter_example_1-16"><a href="#lst_parameter_example_1-16" aria-hidden="true" tabindex="-1"></a>        format_str: String, </span>
 <span id="lst_parameter_example_1-17"><a href="#lst_parameter_example_1-17" aria-hidden="true" tabindex="-1"></a>        arg1: param1Type</span>
-<span id="lst_parameter_example_1-18"><a href="#lst_parameter_example_1-18" aria-hidden="true" tabindex="-1"></a>    ) raises <span class="op">-&gt;</span> String:</span>
+<span id="lst_parameter_example_1-18"><a href="#lst_parameter_example_1-18" aria-hidden="true" tabindex="-1"></a>    ) <span class="cf">raises</span> <span class="op">-&gt;</span> String:</span>
 <span id="lst_parameter_example_1-19"><a href="#lst_parameter_example_1-19" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"In Overload 1"</span>)</span>
 <span id="lst_parameter_example_1-20"><a href="#lst_parameter_example_1-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="lst_parameter_example_1-21"><a href="#lst_parameter_example_1-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">""</span>   <span class="co"># Placeholder return</span></span>
@@ -545,7 +545,7 @@ After swap: Programming Mojo</code></pre>
 <span id="lst_parameter_example_1-28"><a href="#lst_parameter_example_1-28" aria-hidden="true" tabindex="-1"></a>    ](</span>
 <span id="lst_parameter_example_1-29"><a href="#lst_parameter_example_1-29" aria-hidden="true" tabindex="-1"></a>        format_str: String, </span>
 <span id="lst_parameter_example_1-30"><a href="#lst_parameter_example_1-30" aria-hidden="true" tabindex="-1"></a>        arg1: param1Type</span>
-<span id="lst_parameter_example_1-31"><a href="#lst_parameter_example_1-31" aria-hidden="true" tabindex="-1"></a>    ) raises <span class="op">-&gt;</span> String:</span>
+<span id="lst_parameter_example_1-31"><a href="#lst_parameter_example_1-31" aria-hidden="true" tabindex="-1"></a>    ) <span class="cf">raises</span> <span class="op">-&gt;</span> String:</span>
 <span id="lst_parameter_example_1-32"><a href="#lst_parameter_example_1-32" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"In Overload 2"</span>)</span>
 <span id="lst_parameter_example_1-33"><a href="#lst_parameter_example_1-33" aria-hidden="true" tabindex="-1"></a></span>
 <span id="lst_parameter_example_1-34"><a href="#lst_parameter_example_1-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">""</span>   <span class="co"># Placeholder return</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -568,9 +568,9 @@ After swap: Programming Mojo</code></pre>
 <h2 class="anchored" data-anchor-id="call-resolution-1">Call resolution</h2>
 <p>If the <code>replacement_field</code> value parameter is not used, the Mojo compiler attempts to resolve the call to <a href="#lst_parameter_example_1-a1" onclick="goToAnnotation(this)">Overload 1</a>. Let’s examine the output of executing calls to <code>format</code>.</p>
 <p>Our first application of <code>format</code> generates a labelled username:</p>
-<div id="cell-33" class="cell" data-execution_count="12">
+<div id="cell-33" class="cell" data-execution_count="61">
 <div class="sourceCode cell-code" id="lst_parameter_call_resolution_1"><pre class="sourceCode mojo code-annotation-code code-with-copy code-annotated"><code class="sourceCode mojosyntax"><button id="lst_parameter_call_resolution_1-a1" class="code-annotation-anchor" data-target-cell="lst_parameter_call_resolution_1" data-target-annotation="1">1</button><span id="lst_parameter_call_resolution_1-1" class="code-annotation-target"><a href="#lst_parameter_call_resolution_1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Call Site A</span></span>
-<span id="lst_parameter_call_resolution_1-2"><a href="#lst_parameter_call_resolution_1-2" aria-hidden="true" tabindex="-1"></a>let username <span class="op">=</span> StringUtils.<span class="bu">format</span>(<span class="st">"Username: </span><span class="sc">{}</span><span class="st">"</span>, <span class="st">"dev#1"</span>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="lst_parameter_call_resolution_1-2"><a href="#lst_parameter_call_resolution_1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> username <span class="op">=</span> StringUtils.<span class="bu">format</span>(<span class="st">"Username: </span><span class="sc">{}</span><span class="st">"</span>, <span class="st">"dev#1"</span>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-annotation">
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
 <dt data-target-cell="lst_parameter_call_resolution_1" data-target-annotation="1">1</dt>
@@ -586,9 +586,9 @@ After swap: Programming Mojo</code></pre>
 <p>The output shows that <a href="#lst_format_resolution_1-a1" onclick="goToAnnotation(this)">Overload 1</a> was invoked.</p>
 <p>While both overloads are candidates, <a href="#lst_parameter_example-a1" onclick="goToAnnotation(this)">Overload 1</a> is the simpler match and the one the compiler picked. We’ll dive into the compiler’s resolution rules in greater detail in a future article.</p>
 <p>Let’s examine another example - this time leveraging the second overload, which carries the <code>replacement_field</code> parameter. Consider a case in which the <code>format_str</code> argument has the “{}” substring embedded, however it is to be preserved; not replaced. In this example, we have a JSON object with an name/value pair where the value is the empty JSON object “{}” and needs to be preserved. So, we instead use “$$” as the replacement field:</p>
-<div id="cell-36" class="cell" data-execution_count="13">
+<div id="cell-36" class="cell" data-execution_count="62">
 <div class="sourceCode cell-code" id="lst_parameter_call_resolution_2"><pre class="sourceCode mojo code-annotation-code code-with-copy code-annotated"><code class="sourceCode mojosyntax"><button id="lst_parameter_call_resolution_2-a1" class="code-annotation-anchor" data-target-cell="lst_parameter_call_resolution_2" data-target-annotation="1">1</button><span id="lst_parameter_call_resolution_2-1" class="code-annotation-target"><a href="#lst_parameter_call_resolution_2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Call Site B</span></span>
-<span id="lst_parameter_call_resolution_2-2"><a href="#lst_parameter_call_resolution_2-2" aria-hidden="true" tabindex="-1"></a>let empty_object <span class="op">=</span> StringUtils.<span class="bu">format</span>[<span class="st">"$$"</span>](<span class="st">'{"$$": </span><span class="sc">{}</span><span class="st">}'</span>, <span class="st">"postal_address"</span>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="lst_parameter_call_resolution_2-2"><a href="#lst_parameter_call_resolution_2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> empty_object <span class="op">=</span> StringUtils.<span class="bu">format</span>[<span class="st">"$$"</span>](<span class="st">'{"$$": </span><span class="sc">{}</span><span class="st">}'</span>, <span class="st">"postal_address"</span>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-annotation">
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
 <dt data-target-cell="lst_parameter_call_resolution_2" data-target-annotation="1">1</dt>
@@ -615,8 +615,8 @@ Explicit parameter specification
 </div>
 <div class="callout-body-container callout-body">
 <p>Note that <a href="#lst_parameter_call_resolution_2-a1%3E" onclick="goToAnnotation(this)">Call Site B</a> did not explicitly pass in <code>String</code> as a parameter and the Mojo compiler successfully inferred the type automatically. In contrast, here is invocation with two explicit parameters:</p>
-<div id="cell-39" class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="lst_parameter_call_resolution_3"><pre class="sourceCode mojo code-annotation-code code-with-copy"><code class="sourceCode mojosyntax"><span id="lst_parameter_call_resolution_3-1"><a href="#lst_parameter_call_resolution_3-1" aria-hidden="true" tabindex="-1"></a>let empty_object <span class="op">=</span> StringUtils.<span class="bu">format</span>[<span class="st">"$$"</span>, String](<span class="st">'{"$$": </span><span class="sc">{}</span><span class="st">}'</span>, <span class="st">"postal_address"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-39" class="cell" data-execution_count="64">
+<div class="sourceCode cell-code" id="lst_parameter_call_resolution_3"><pre class="sourceCode mojo code-annotation-code code-with-copy"><code class="sourceCode mojosyntax"><span id="lst_parameter_call_resolution_3-1"><a href="#lst_parameter_call_resolution_3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> empty_object <span class="op">=</span> StringUtils.<span class="bu">format</span>[<span class="st">"$$"</span>, String](<span class="st">'{"$$": </span><span class="sc">{}</span><span class="st">}'</span>, <span class="st">"postal_address"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>In Overload 2</code></pre>
 </div>
@@ -628,7 +628,7 @@ Explicit parameter specification
 <h1>Combined argument and parameter signatures overloading</h1>
 <p>Mojo allows function overloading via both argument and parameter signature overloading at the same time.</p>
 <p>Let’s expand our <code>StringUtils</code> example from the previous section to introduce more overloads of the <code>format</code> function to support multiple replacement fields in <code>format_str</code>. While the overloads vary in argument and parameter signature, they all serve the purpose as before - format a string based on an input string template and replacements for demarcated fields:</p>
-<div id="cell-42" class="cell" data-execution_count="15">
+<div id="cell-42" class="cell" data-execution_count="65">
 <div class="sourceCode cell-code" id="lst_parameter_example_2"><pre class="sourceCode mojo code-annotation-code code-with-copy code-annotated"><code class="sourceCode mojosyntax"><span id="lst_parameter_example_2-1"><a href="#lst_parameter_example_2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> StringUtils:    </span>
 <span id="lst_parameter_example_2-2"><a href="#lst_parameter_example_2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Each overload of `format` returns a copy of the `format_str` with all occurrences </span></span>
 <span id="lst_parameter_example_2-3"><a href="#lst_parameter_example_2-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># of substring "{}" replaced by the remaining arguments in order, converted to </span></span>
@@ -644,7 +644,7 @@ Explicit parameter specification
 <span id="lst_parameter_example_2-13"><a href="#lst_parameter_example_2-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> <span class="bu">format</span>[param1Type: Stringable](</span>
 <span id="lst_parameter_example_2-14"><a href="#lst_parameter_example_2-14" aria-hidden="true" tabindex="-1"></a>        format_str: String, </span>
 <span id="lst_parameter_example_2-15"><a href="#lst_parameter_example_2-15" aria-hidden="true" tabindex="-1"></a>        arg1: param1Type</span>
-<span id="lst_parameter_example_2-16"><a href="#lst_parameter_example_2-16" aria-hidden="true" tabindex="-1"></a>    ) raises <span class="op">-&gt;</span> String:</span>
+<span id="lst_parameter_example_2-16"><a href="#lst_parameter_example_2-16" aria-hidden="true" tabindex="-1"></a>    ) <span class="cf">raises</span> <span class="op">-&gt;</span> String:</span>
 <span id="lst_parameter_example_2-17"><a href="#lst_parameter_example_2-17" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"In Overload 1"</span>)</span>
 <span id="lst_parameter_example_2-18"><a href="#lst_parameter_example_2-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="lst_parameter_example_2-19"><a href="#lst_parameter_example_2-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">""</span>   <span class="co"># Placeholder return</span></span>
@@ -657,7 +657,7 @@ Explicit parameter specification
 <span id="lst_parameter_example_2-26"><a href="#lst_parameter_example_2-26" aria-hidden="true" tabindex="-1"></a>    ](</span>
 <span id="lst_parameter_example_2-27"><a href="#lst_parameter_example_2-27" aria-hidden="true" tabindex="-1"></a>        format_str: String, </span>
 <span id="lst_parameter_example_2-28"><a href="#lst_parameter_example_2-28" aria-hidden="true" tabindex="-1"></a>        arg1: param1Type</span>
-<span id="lst_parameter_example_2-29"><a href="#lst_parameter_example_2-29" aria-hidden="true" tabindex="-1"></a>    ) raises <span class="op">-&gt;</span> String:</span>
+<span id="lst_parameter_example_2-29"><a href="#lst_parameter_example_2-29" aria-hidden="true" tabindex="-1"></a>    ) <span class="cf">raises</span> <span class="op">-&gt;</span> String:</span>
 <span id="lst_parameter_example_2-30"><a href="#lst_parameter_example_2-30" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"In Overload 2"</span>)</span>
 <span id="lst_parameter_example_2-31"><a href="#lst_parameter_example_2-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="lst_parameter_example_2-32"><a href="#lst_parameter_example_2-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">""</span>   <span class="co"># Placeholder return</span></span>
@@ -668,7 +668,7 @@ Explicit parameter specification
 <span id="lst_parameter_example_2-37"><a href="#lst_parameter_example_2-37" aria-hidden="true" tabindex="-1"></a>        format_str: String, </span>
 <span id="lst_parameter_example_2-38"><a href="#lst_parameter_example_2-38" aria-hidden="true" tabindex="-1"></a>        arg1: param1Type, </span>
 <span id="lst_parameter_example_2-39"><a href="#lst_parameter_example_2-39" aria-hidden="true" tabindex="-1"></a>        arg2: param2Type</span>
-<span id="lst_parameter_example_2-40"><a href="#lst_parameter_example_2-40" aria-hidden="true" tabindex="-1"></a>    ) raises <span class="op">-&gt;</span> String:</span>
+<span id="lst_parameter_example_2-40"><a href="#lst_parameter_example_2-40" aria-hidden="true" tabindex="-1"></a>    ) <span class="cf">raises</span> <span class="op">-&gt;</span> String:</span>
 <span id="lst_parameter_example_2-41"><a href="#lst_parameter_example_2-41" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"In Overload 3"</span>)</span>
 <span id="lst_parameter_example_2-42"><a href="#lst_parameter_example_2-42" aria-hidden="true" tabindex="-1"></a></span>
 <span id="lst_parameter_example_2-43"><a href="#lst_parameter_example_2-43" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">""</span>   <span class="co"># Placeholder return</span></span>
@@ -683,7 +683,7 @@ Explicit parameter specification
 <span id="lst_parameter_example_2-52"><a href="#lst_parameter_example_2-52" aria-hidden="true" tabindex="-1"></a>        format_str: String, </span>
 <span id="lst_parameter_example_2-53"><a href="#lst_parameter_example_2-53" aria-hidden="true" tabindex="-1"></a>        arg1: param1Type, </span>
 <span id="lst_parameter_example_2-54"><a href="#lst_parameter_example_2-54" aria-hidden="true" tabindex="-1"></a>        arg2: param2Type</span>
-<span id="lst_parameter_example_2-55"><a href="#lst_parameter_example_2-55" aria-hidden="true" tabindex="-1"></a>    ) raises <span class="op">-&gt;</span> String:</span>
+<span id="lst_parameter_example_2-55"><a href="#lst_parameter_example_2-55" aria-hidden="true" tabindex="-1"></a>    ) <span class="cf">raises</span> <span class="op">-&gt;</span> String:</span>
 <span id="lst_parameter_example_2-56"><a href="#lst_parameter_example_2-56" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"In Overload 4"</span>)</span>
 <span id="lst_parameter_example_2-57"><a href="#lst_parameter_example_2-57" aria-hidden="true" tabindex="-1"></a></span>
 <span id="lst_parameter_example_2-58"><a href="#lst_parameter_example_2-58" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">""</span>   <span class="co"># Placeholder return</span></span>
@@ -699,7 +699,7 @@ Explicit parameter specification
 <span id="lst_parameter_example_2-68"><a href="#lst_parameter_example_2-68" aria-hidden="true" tabindex="-1"></a>        arg1: param1Type, </span>
 <span id="lst_parameter_example_2-69"><a href="#lst_parameter_example_2-69" aria-hidden="true" tabindex="-1"></a>        arg2: param2Type,</span>
 <span id="lst_parameter_example_2-70"><a href="#lst_parameter_example_2-70" aria-hidden="true" tabindex="-1"></a>        arg3: param3Type</span>
-<span id="lst_parameter_example_2-71"><a href="#lst_parameter_example_2-71" aria-hidden="true" tabindex="-1"></a>    ) raises <span class="op">-&gt;</span> String:</span>
+<span id="lst_parameter_example_2-71"><a href="#lst_parameter_example_2-71" aria-hidden="true" tabindex="-1"></a>    ) <span class="cf">raises</span> <span class="op">-&gt;</span> String:</span>
 <span id="lst_parameter_example_2-72"><a href="#lst_parameter_example_2-72" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"In Overload 5"</span>)</span>
 <span id="lst_parameter_example_2-73"><a href="#lst_parameter_example_2-73" aria-hidden="true" tabindex="-1"></a></span>
 <span id="lst_parameter_example_2-74"><a href="#lst_parameter_example_2-74" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">""</span>   <span class="co"># Placeholder return</span></span>
@@ -716,7 +716,7 @@ Explicit parameter specification
 <span id="lst_parameter_example_2-85"><a href="#lst_parameter_example_2-85" aria-hidden="true" tabindex="-1"></a>        arg1: param1Type, </span>
 <span id="lst_parameter_example_2-86"><a href="#lst_parameter_example_2-86" aria-hidden="true" tabindex="-1"></a>        arg2: param2Type,</span>
 <span id="lst_parameter_example_2-87"><a href="#lst_parameter_example_2-87" aria-hidden="true" tabindex="-1"></a>        arg3: param3Type</span>
-<span id="lst_parameter_example_2-88"><a href="#lst_parameter_example_2-88" aria-hidden="true" tabindex="-1"></a>    ) raises <span class="op">-&gt;</span> String:</span>
+<span id="lst_parameter_example_2-88"><a href="#lst_parameter_example_2-88" aria-hidden="true" tabindex="-1"></a>    ) <span class="cf">raises</span> <span class="op">-&gt;</span> String:</span>
 <span id="lst_parameter_example_2-89"><a href="#lst_parameter_example_2-89" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"In Overload 6"</span>)</span>
 <span id="lst_parameter_example_2-90"><a href="#lst_parameter_example_2-90" aria-hidden="true" tabindex="-1"></a></span>
 <span id="lst_parameter_example_2-91"><a href="#lst_parameter_example_2-91" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">""</span>   <span class="co"># Placeholder return</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -752,9 +752,9 @@ Explicit parameter specification
 <section id="call-resolution-2" class="level2">
 <h2 class="anchored" data-anchor-id="call-resolution-2">Call resolution</h2>
 <p>Let’s take a look at the output of executing some calls to <code>format</code>. The following generates a JSON object with one name/value pair:</p>
-<div id="cell-46" class="cell" data-execution_count="16">
+<div id="cell-46" class="cell" data-execution_count="66">
 <div class="sourceCode cell-code" id="lst_parameter_call_resolution_4"><pre class="sourceCode mojo code-annotation-code code-with-copy code-annotated"><code class="sourceCode mojosyntax"><button id="lst_parameter_call_resolution_4-a1" class="code-annotation-anchor" data-target-cell="lst_parameter_call_resolution_4" data-target-annotation="1">1</button><span id="lst_parameter_call_resolution_4-1" class="code-annotation-target"><a href="#lst_parameter_call_resolution_4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Call Site C</span></span>
-<span id="lst_parameter_call_resolution_4-2"><a href="#lst_parameter_call_resolution_4-2" aria-hidden="true" tabindex="-1"></a>let key_value <span class="op">=</span> StringUtils.<span class="bu">format</span>(<span class="st">"format </span><span class="sc">{}</span><span class="st"> </span><span class="sc">{}</span><span class="st">"</span>, <span class="st">"usage_count"</span>, <span class="dv">6</span>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="lst_parameter_call_resolution_4-2"><a href="#lst_parameter_call_resolution_4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> key_value <span class="op">=</span> StringUtils.<span class="bu">format</span>(<span class="st">"format </span><span class="sc">{}</span><span class="st"> </span><span class="sc">{}</span><span class="st">"</span>, <span class="st">"usage_count"</span>, <span class="dv">6</span>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-annotation">
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
 <dt data-target-cell="lst_parameter_call_resolution_4" data-target-annotation="1">1</dt>
@@ -770,9 +770,9 @@ Explicit parameter specification
 <p>The output indicates that <a href="#lst_parameter_example_2-a3" onclick="goToAnnotation(this)">Overload 3</a> was invoked.</p>
 <p><a href="#lst_parameter_call_resolution_4-a1" onclick="goToAnnotation(this)">Call Site C</a> invokes <code>format</code> with no ‘StringLiteral’ value parameter and three arguments. So the compiler selects <a href="#lst_parameter_example_2-a3" onclick="goToAnnotation(this)">Overload 3</a> was invoked.</p>
 <p>As another example, we format a log entry with a standard format for date/time, log level, and log text.</p>
-<div id="cell-49" class="cell" data-execution_count="17">
+<div id="cell-49" class="cell" data-execution_count="67">
 <div class="sourceCode cell-code" id="lst_parameter_call_resolution_5"><pre class="sourceCode mojo code-annotation-code code-with-copy code-annotated"><code class="sourceCode mojosyntax"><button id="lst_parameter_call_resolution_5-a1" class="code-annotation-anchor" data-target-cell="lst_parameter_call_resolution_5" data-target-annotation="1">1</button><span id="lst_parameter_call_resolution_5-1" class="code-annotation-target"><a href="#lst_parameter_call_resolution_5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Call Site D</span></span>
-<span id="lst_parameter_call_resolution_5-2"><a href="#lst_parameter_call_resolution_5-2" aria-hidden="true" tabindex="-1"></a>let log_entry <span class="op">=</span> StringUtils.<span class="bu">format</span>(</span>
+<span id="lst_parameter_call_resolution_5-2"><a href="#lst_parameter_call_resolution_5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> log_entry <span class="op">=</span> StringUtils.<span class="bu">format</span>(</span>
 <span id="lst_parameter_call_resolution_5-3"><a href="#lst_parameter_call_resolution_5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"[</span><span class="sc">{}</span><span class="st">] </span><span class="sc">{}</span><span class="st">: </span><span class="sc">{}</span><span class="st">"</span>, </span>
 <span id="lst_parameter_call_resolution_5-4"><a href="#lst_parameter_call_resolution_5-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"2024-01-11T19:20:52Z"</span>, </span>
 <span id="lst_parameter_call_resolution_5-5"><a href="#lst_parameter_call_resolution_5-5" aria-hidden="true" tabindex="-1"></a>    <span class="dv">3</span>, </span>
