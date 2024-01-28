@@ -413,6 +413,30 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       changeGiscusTheme();
     }
   }
+  const toggleUtterancesIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#utterances-base-theme')?.value ?? 'github-light';
+    const alternateTheme = document.querySelector('#utterances-alt-theme')?.value ?? 'github-dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeUtterancesTheme = () => {
+      if (document.querySelector('iframe.utterances-frame')) {
+        const message = {
+          type: 'set-theme',
+          theme: newTheme
+        };
+        const iframe = document.querySelector('iframe.utterances-frame');
+        iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+      }
+    }
+    const isUtterancesLoaded = window.document.querySelector('iframe.utterances-frame') !== null;
+    if (isUtterancesLoaded) {
+      changeUtterancesTheme();
+    }
+  }
   const toggleColorMode = (alternate) => {
     // Switch the stylesheets
     const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
@@ -488,6 +512,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     toggleColorMode(toAlternate);
     setStyleSentinel(toAlternate);
     toggleGiscusIfUsed(toAlternate, darkModeDefault);
+    toggleUtterancesIfUsed(toAlternate, darkModeDefault);
   };
   // Ensure there is a toggle, if there isn't float one in the top right
   if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
@@ -880,6 +905,10 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<script src="https://utteranc.es/client.js" repo="KaizenEngineering/blog" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+<input type="hidden" id="utterances-base-theme" value="github-light">
+<input type="hidden" id="utterances-alt-theme" value="github-dark">
 </div> <!-- /content -->
 
 
