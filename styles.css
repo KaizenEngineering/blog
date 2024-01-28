@@ -1,0 +1,18 @@
+/* css styles */
+
+/* fix up top padding for callouts in margin */
+.callout {
+    padding-top: 0px !important;
+}
+
+p {
+  text-align: justify !important
+}
+
+.cell-output {
+  background-color: var(--bs-info-bg-subtle);
+  border-width: 2px;
+  border-style: dashed;
+  border-color: var(--bs-info-border-subtle);
+  margin-top: -1em;
+}

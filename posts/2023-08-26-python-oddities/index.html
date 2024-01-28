@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Alan Horne">
+<meta name="dcterms.date" content="2023-08-26">
 
-<title>blog</title>
+<title>blog - Python Oddities</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,29 +22,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,35 +104,6 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 <script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-<script>
     function goToAnnotation(elt) {
       annotationId = elt.href.split('#')[1];
       a = document.getElementById(annotationId);
@@ -108,10 +113,8 @@ ul.task-list li input[type="checkbox"] {
     }
 </script>
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
 <body class="nav-fixed">
@@ -121,7 +124,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">blog</span>
     </a>
   </div>
@@ -132,7 +135,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">about</span></a>
   </li>  
 </ul>
@@ -146,430 +149,152 @@ ul.task-list li input[type="checkbox"] {
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">blog</h1>
-                      </div>
+    <div class="quarto-title column-body">
+      <h1 class="title">Python Oddities</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">Python</div>
+              </div>
+                  </div>
   </div>
     
   
-  <div class="quarto-title-meta column-page-left">
+  <div class="quarto-title-meta">
 
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Alan Horne </p>
+            </div>
+    </div>
       
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 26, 2023</p>
+      </div>
+    </div>
     
       
     </div>
     
   
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(9)</span></div><div class="category" data-category="Python">Python <span class="quarto-category-count">(1)</span></div><div class="category" data-category="analysis">analysis <span class="quarto-category-count">(1)</span></div><div class="category" data-category="code">code <span class="quarto-category-count">(1)</span></div><div class="category" data-category="functions">functions <span class="quarto-category-count">(4)</span></div><div class="category" data-category="methods">methods <span class="quarto-category-count">(4)</span></div><div class="category" data-category="news">news <span class="quarto-category-count">(2)</span></div><div class="category" data-category="overloading">overloading <span class="quarto-category-count">(4)</span></div></div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#python-oddities" id="toc-python-oddities" class="nav-link active" data-scroll-target="#python-oddities">Python Oddities</a>
+  <ul class="collapse">
+  <li><a href="#comparisons-have-equal-priority-when-chained" id="toc-comparisons-have-equal-priority-when-chained" class="nav-link" data-scroll-target="#comparisons-have-equal-priority-when-chained">Comparisons have equal priority when chained</a></li>
+  <li><a href="#function-scope-is-the-only-scope" id="toc-function-scope-is-the-only-scope" class="nav-link" data-scroll-target="#function-scope-is-the-only-scope">Function scope is the only scope</a></li>
+  <li><a href="#function-argument-default-values-are-mutable" id="toc-function-argument-default-values-are-mutable" class="nav-link" data-scroll-target="#function-argument-default-values-are-mutable">Function argument default values are mutable</a></li>
+  <li><a href="#return-in-a-finally-will-pre-empt-return-in-a-try" id="toc-return-in-a-finally-will-pre-empt-return-in-a-try" class="nav-link" data-scroll-target="#return-in-a-finally-will-pre-empt-return-in-a-try">Return in a finally will pre-empt return in a try</a></li>
+  <li><a href="#integers-from--5-to-256-are-preallocated-objects" id="toc-integers-from--5-to-256-are-preallocated-objects" class="nav-link" data-scroll-target="#integers-from--5-to-256-are-preallocated-objects">Integers from -5 to 256 are preallocated objects</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
 
 
-
-
-
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-listing-file-modified-sort="1699048384615" data-listing-reading-time-sort="2" data-listing-word-count-sort="359">
-<div class="thumbnail">
-<p><a href="./posts/2023-10-09-code-annotations/index.html"></a></p><a href="./posts/2023-10-09-code-annotations/index.html">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/2023-10-09-code-annotations/index.html"></a></p>
-</div>
-<div class="body">
-<p><a href="./posts/2023-10-09-code-annotations/index.html"></a></p><a href="./posts/2023-10-09-code-annotations/index.html">
-<h3 class="no-anchor listing-title">
-Code Annotation Hyperlinks
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-This page requires modifications from commit <code>a07dee1f</code> in quarto-cli fork - it modifies how code annotations are produced / handled.
-</div>
-</a>
-</div>
-<div class="metadata">
-<p><a href="./posts/2023-10-09-code-annotations/index.html"></a></p><a href="./posts/2023-10-09-code-annotations/index.html">
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="" data-listing-date-sort="1693717200000" data-listing-file-modified-sort="1697908219446" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1304">
-<div class="thumbnail">
-<p><a href="./posts/2023-09-04-styling/index.html"></a></p><a href="./posts/2023-09-04-styling/index.html">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/2023-09-04-styling/index.html"></a></p>
-</div>
-<div class="body">
-<p><a href="./posts/2023-09-04-styling/index.html"></a></p><a href="./posts/2023-09-04-styling/index.html">
-<h3 class="no-anchor listing-title">
-Styling
-</h3>
-<div class="listing-subtitle">
-
-</div>
-</a>
-<div class="listing-categories">
-
-</div>
-<p><a href="./posts/2023-09-04-styling/index.html"></a></p><a href="./posts/2023-09-04-styling/index.html">
-<div class="listing-description">
-Aenean lacus metus, bibendum ut turpis sit amet, eleifend pellentesque nisi. Nunc ornare lectus vitae felis pharetra, id porttitor risus ullamcorper. Integer ac rutrum arcu.…
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./posts/2023-09-04-styling/index.html">
-<div class="listing-date">
-Sep 3, 2023
-</div>
-<div class="listing-author">
-Alan Horne
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="Python" data-listing-date-sort="1693035360000" data-listing-file-modified-sort="1697908221506" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="37">
-<div class="thumbnail">
-<p><a href="./posts/2023-08-26-python-oddities/index.html"></a></p><a href="./posts/2023-08-26-python-oddities/index.html">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/2023-08-26-python-oddities/index.html"></a></p>
-</div>
-<div class="body">
-<p><a href="./posts/2023-08-26-python-oddities/index.html"></a></p><a href="./posts/2023-08-26-python-oddities/index.html">
-<h3 class="no-anchor listing-title">
-Python Oddities
-</h3>
-<div class="listing-subtitle">
-
-</div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
-</div>
-<p><a href="./posts/2023-08-26-python-oddities/index.html"></a></p><a href="./posts/2023-08-26-python-oddities/index.html">
-<div class="listing-description">
-
-
+<section id="python-oddities" class="level1">
+<h1>Python Oddities</h1>
 <section id="comparisons-have-equal-priority-when-chained" class="level2">
-
+<h2 class="anchored" data-anchor-id="comparisons-have-equal-priority-when-chained">Comparisons have equal priority when chained</h2>
 <div id="cell-2" class="cell" data-execution_count="53">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1">(<span class="va">False</span> <span class="op">==</span> <span class="va">False</span>) <span class="kw">in</span> [<span class="va">False</span>]</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>(<span class="va">False</span> <span class="op">==</span> <span class="va">False</span>) <span class="kw">in</span> [<span class="va">False</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="53">
 <pre><code>False</code></pre>
 </div>
 </div>
 <div id="cell-3" class="cell" data-execution_count="54">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><span class="va">False</span> <span class="op">==</span> (<span class="va">False</span> <span class="kw">in</span> [<span class="va">False</span>])</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">False</span> <span class="op">==</span> (<span class="va">False</span> <span class="kw">in</span> [<span class="va">False</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="54">
 <pre><code>False</code></pre>
 </div>
 </div>
 <div id="cell-4" class="cell" data-execution_count="55">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><span class="va">False</span> <span class="op">==</span> <span class="va">False</span> <span class="kw">in</span> [<span class="va">False</span>]</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="va">False</span> <span class="op">==</span> <span class="va">False</span> <span class="kw">in</span> [<span class="va">False</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="55">
 <pre><code>True</code></pre>
 </div>
 </div>
 </section>
 <section id="function-scope-is-the-only-scope" class="level2">
-
+<h2 class="anchored" data-anchor-id="function-scope-is-the-only-scope">Function scope is the only scope</h2>
 <div id="cell-6" class="cell" data-execution_count="61">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">100</span>):</span>
-<span id="cb7-2">    <span class="cf">pass</span></span>
-<span id="cb7-3"></span>
-<span id="cb7-4"><span class="bu">print</span>(x)</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">100</span>):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>99</code></pre>
 </div>
 </div>
 </section>
 <section id="function-argument-default-values-are-mutable" class="level2">
-
+<h2 class="anchored" data-anchor-id="function-argument-default-values-are-mutable">Function argument default values are mutable</h2>
 <div id="cell-8" class="cell" data-execution_count="64">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><span class="kw">def</span>…<span class="op"></span></span><span id="cb9-2"><span class="st"></span></span><span id="cb9-3"><span class="cf"></span></span><span id="cb9-4"></span><span id="cb9-5"><span class="bu"></span></span><span id="cb9-6"><span class="bu"></span></span><span id="cb9-7"><span class="bu"></span></span></code></pre></div><div class="cell-output cell-output-stdout"><pre><code></code></pre></div></div></section><section id="return-in-a-finally-will-pre-empt-return-in-a-try" class="level2"><div id="cell-10" class="cell" data-execution_count="65"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><span class="kw"></span></span><span id="cb11-2"><span class="cf"></span></span><span id="cb11-3"><span class="cf"></span><span class="st"></span></span><span id="cb11-4"><span class="cf"></span></span><span id="cb11-5"><span class="cf"></span><span class="st"></span></span><span id="cb11-6"></span><span id="cb11-7"><span class="bu"></span></span></code></pre></div><div class="cell-output cell-output-stdout"><pre><code></code></pre></div></div></section><section id="integers-from--5-to-256-are-preallocated-objects" class="level2"><div id="cell-12" class="cell" data-execution_count="73"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><span class="op"></span><span class="dv"></span></span><span id="cb13-2"><span class="op"></span><span class="dv"></span></span><span id="cb13-3"><span class="kw"></span></span></code></pre></div><div class="cell-output cell-output-display" data-execution_count="73"><pre><code></code></pre></div></div><div id="cell-13" class="cell" data-execution_count="72"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><span class="op"></span><span class="dv"></span></span><span id="cb15-2"><span class="op"></span><span class="dv"></span></span><span id="cb15-3"><span class="kw"></span></span></code></pre></div><div class="cell-output cell-output-display" data-execution_count="72"><pre><code></code></pre></div></div></section>
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./posts/2023-08-26-python-oddities/index.html">
-<div class="listing-date">
-Aug 26, 2023
-</div>
-<div class="listing-author">
-Alan Horne
-</div>
-</a>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> f(arg<span class="op">=</span>[]):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    arg.append(<span class="st">"value"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> arg</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(f())</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(f())</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(f())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['value']
+['value', 'value']
+['value', 'value', 'value']</code></pre>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="3" data-categories="functions,methods,overloading" data-listing-date-sort="1692815580000" data-listing-file-modified-sort="1706428662421" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1488">
-<div class="thumbnail">
-<p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt1/index.html"></a></p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt1/index.html">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt1/index.html"></a></p>
+</section>
+<section id="return-in-a-finally-will-pre-empt-return-in-a-try" class="level2">
+<h2 class="anchored" data-anchor-id="return-in-a-finally-will-pre-empt-return-in-a-try">Return in a finally will pre-empt return in a try</h2>
+<div id="cell-10" class="cell" data-execution_count="65">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> f():</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">"try return"</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">finally</span>:</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">"finally return"</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(f())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>finally return</code></pre>
 </div>
-<div class="body">
-<p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt1/index.html"></a></p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt1/index.html">
-<h3 class="no-anchor listing-title">
-Function Overloading in Mojo
-</h3>
-<div class="listing-subtitle">
+</div>
+</section>
+<section id="integers-from--5-to-256-are-preallocated-objects" class="level2">
+<h2 class="anchored" data-anchor-id="integers-from--5-to-256-are-preallocated-objects">Integers from -5 to 256 are preallocated objects</h2>
+<div id="cell-12" class="cell" data-execution_count="73">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="dv">256</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="dv">256</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>a <span class="kw">is</span> b</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="73">
+<pre><code>True</code></pre>
+</div>
+</div>
+<div id="cell-13" class="cell" data-execution_count="72">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="dv">257</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="dv">257</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>a <span class="kw">is</span> b</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="72">
+<pre><code>False</code></pre>
+</div>
+</div>
 
-</div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('functions'); return false;">
-functions
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('methods'); return false;">
-methods
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('overloading'); return false;">
-overloading
-</div>
-</div>
-<p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt1/index.html"></a></p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt1/index.html">
-<div class="listing-description">
-Mojo allows multiple functions with the same name to coexist, provided their argument or parameter signatures are different. <!--C++ programmers are familiar, however Python doesn't natively support overloading.--> Function overloading features are seen in other…
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./posts/2023-08-24-function-overloading-in-mojo-pt1/index.html">
-<div class="listing-date">
-Aug 23, 2023
-</div>
-<div class="listing-author">
-Kaizen Engineering
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="functions,methods,overloading" data-listing-date-sort="1692815580000" data-listing-file-modified-sort="1705673913658" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="246">
-<div class="thumbnail">
-<p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt2/index.html"></a></p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt2/index.html">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt2/index.html"></a></p>
-</div>
-<div class="body">
-<p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt2/index.html"></a></p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt2/index.html">
-<h3 class="no-anchor listing-title">
-Function Overloading in Mojo - Part 2
-</h3>
-<div class="listing-subtitle">
 
-</div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('functions'); return false;">
-functions
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('methods'); return false;">
-methods
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('overloading'); return false;">
-overloading
-</div>
-</div>
-<p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt2/index.html"></a></p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt2/index.html">
-<div class="listing-description">
-Mojo allows multiple functions with the same name to coexist, provided their parameter signatures are different. <!--C++ programmers are familiar, however Python doesn't natively support overloading.--> This function overloading feature is seen in other…
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./posts/2023-08-24-function-overloading-in-mojo-pt2/index.html">
-<div class="listing-date">
-Aug 23, 2023
-</div>
-<div class="listing-author">
-Shaival Varma
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="5" data-categories="functions,methods,overloading" data-listing-date-sort="1692815580000" data-listing-file-modified-sort="1699031075715" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="804">
-<div class="thumbnail">
-<p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt3/index.html"></a></p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt3/index.html">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt3/index.html"></a></p>
-</div>
-<div class="body">
-<p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt3/index.html"></a></p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt3/index.html">
-<h3 class="no-anchor listing-title">
-Function Overloading in Mojo - Part 3
-</h3>
-<div class="listing-subtitle">
+</section>
+</section>
 
-</div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('functions'); return false;">
-functions
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('methods'); return false;">
-methods
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('overloading'); return false;">
-overloading
-</div>
-</div>
-<p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt3/index.html"></a></p><a href="./posts/2023-08-24-function-overloading-in-mojo-pt3/index.html">
-<div class="listing-description">
-Mojo allows multiple functions with the same name to coexist, provided their parameter signatures are different. <!--C++ programmers are familiar, however Python doesn't natively support overloading.--> This function overloading feature is seen in other…
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./posts/2023-08-24-function-overloading-in-mojo-pt3/index.html">
-<div class="listing-date">
-Aug 23, 2023
-</div>
-<div class="listing-author">
-Shaival Varma
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="6" data-categories="functions,methods,overloading" data-listing-date-sort="1692478800000" data-listing-file-modified-sort="1696787185154" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="433">
-<div class="thumbnail">
-<p><a href="./posts/2023-08-19-test-blog-post/index.html"></a></p><a href="./posts/2023-08-19-test-blog-post/index.html">
-<p class="card-img-top"><img src="posts/2023-08-19-test-blog-post/index_files/figure-html/cell-2-output-1.png"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/2023-08-19-test-blog-post/index.html"></a></p>
-</div>
-<div class="body">
-<p><a href="./posts/2023-08-19-test-blog-post/index.html"></a></p><a href="./posts/2023-08-19-test-blog-post/index.html">
-<h3 class="no-anchor listing-title">
-Test Blog Post
-</h3>
-<div class="listing-subtitle">
-
-</div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('functions'); return false;">
-functions
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('methods'); return false;">
-methods
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('overloading'); return false;">
-overloading
-</div>
-</div>
-<p><a href="./posts/2023-08-19-test-blog-post/index.html"></a></p><a href="./posts/2023-08-19-test-blog-post/index.html">
-<div class="listing-description">
-This is a default callout of ‘Note’ type.
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./posts/2023-08-19-test-blog-post/index.html">
-<div class="listing-date">
-Aug 19, 2023
-</div>
-<div class="listing-author">
-Shaival Varma
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="7" data-categories="news,code,analysis" data-listing-date-sort="1692457200000" data-listing-file-modified-sort="1696787185154" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="7">
-<div class="thumbnail">
-<p><a href="./posts/2023-08-19-post-with-code/index.html"></a></p><a href="./posts/2023-08-19-post-with-code/index.html">
-<p><img src="./posts/2023-08-19-post-with-code/image.jpg" class="thumbnail-image"></p>
-</a><p><a href="./posts/2023-08-19-post-with-code/index.html"></a></p>
-</div>
-<div class="body">
-<p><a href="./posts/2023-08-19-post-with-code/index.html"></a></p><a href="./posts/2023-08-19-post-with-code/index.html">
-<h3 class="no-anchor listing-title">
-Post With Code
-</h3>
-<div class="listing-subtitle">
-
-</div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('news'); return false;">
-news
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('code'); return false;">
-code
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('analysis'); return false;">
-analysis
-</div>
-</div>
-<p><a href="./posts/2023-08-19-post-with-code/index.html"></a></p><a href="./posts/2023-08-19-post-with-code/index.html">
-<div class="listing-description">
-This is a post with executable code.
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./posts/2023-08-19-post-with-code/index.html">
-<div class="listing-date">
-Aug 19, 2023
-</div>
-<div class="listing-author">
-Harlow Malloc
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="8" data-categories="news" data-listing-date-sort="1692194400000" data-listing-file-modified-sort="1696787185154" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="32">
-<div class="thumbnail">
-<p><a href="./posts/2023-08-19-welcome/index.html"></a></p><a href="./posts/2023-08-19-welcome/index.html">
-<p class="card-img-top"><img src="posts/2023-08-19-welcome/thumbnail.jpg"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/2023-08-19-welcome/index.html"></a></p>
-</div>
-<div class="body">
-<p><a href="./posts/2023-08-19-welcome/index.html"></a></p><a href="./posts/2023-08-19-welcome/index.html">
-<h3 class="no-anchor listing-title">
-Welcome To My Blog
-</h3>
-<div class="listing-subtitle">
-
-</div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('news'); return false;">
-news
-</div>
-</div>
-<p><a href="./posts/2023-08-19-welcome/index.html"></a></p><a href="./posts/2023-08-19-welcome/index.html">
-<div class="listing-description">
-This is the first post in a Quarto blog. Welcome!
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./posts/2023-08-19-welcome/index.html">
-<div class="listing-date">
-Aug 16, 2023
-</div>
-<div class="listing-author">
-Tristan O’Malley
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
