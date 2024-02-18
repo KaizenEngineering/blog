@@ -1,317 +1,93 @@
 [
   {
-    "objectID": "nbs/00_core.html",
-    "href": "nbs/00_core.html",
-    "title": "core",
+    "objectID": "posts/function-overloading-in-mojo-pt1/index.html",
+    "href": "posts/function-overloading-in-mojo-pt1/index.html",
+    "title": "Function Overloading in Mojo",
     "section": "",
-    "text": "Fill in a module description here\n\n::: {#cell-3 .cell 0=‘h’ 1=‘i’ 2=‘d’ 3=‘e’}\nfrom nbdev.showdoc import *\n:::\n::: {#cell-4 .cell 0=‘e’ 1=‘x’ 2=‘p’ 3=‘o’ 4=‘r’ 5=‘t’}\ndef foo(): pass\n:::\n::: {#cell-5 .cell 0=‘h’ 1=‘i’ 2=‘d’ 3=‘e’}\nimport nbdev; nbdev.nbdev_export()\n:::"
+    "text": "Mojo allows multiple functions with the same name to coexist, provided their argument or parameter signatures are different.  Function overloading features are seen in other languages as well, such as C++.\n\nFunction overloading allows semantically similar functions to share a name, facilitates easier customization of implementations based on argument or parameter signatures, and empowers the compiler to more rigorously type check at the function call site.\n\nThis article covers Mojo syntax for function overloading. In future articles we may dive into details of overload resolution at function call site and discuss best practices for overloading.\nTo begin, let’s examine overloading via argument signatures.\n\n\n\n\n\n\nA note on code examples\n\n\n\nThe code examples in this article provide function signatures and invocations, and they typically skip implementation details. This is to maintain a focus on function overloading without distracting particulars of data structures and algorithms."
   },
   {
-    "objectID": "mojo/function-overloading-in-mojo-pt1-decl.html",
-    "href": "mojo/function-overloading-in-mojo-pt1-decl.html",
-    "title": "Function Overloading in Mojo Pt 1 - Declaration Tests",
-    "section": "",
-    "text": "This file implements all the code used in the article, with the goal verify that the published code is syntactically and logically correct."
+    "objectID": "posts/function-overloading-in-mojo-pt1/index.html#call-resolution",
+    "href": "posts/function-overloading-in-mojo-pt1/index.html#call-resolution",
+    "title": "Function Overloading in Mojo",
+    "section": "Call resolution",
+    "text": "Call resolution\nThe Mojo compiler resolves the call at invocation site, selecting one of the overloads based on the argument list. Let’s examine the output of executing the insert call in this code:\n\nvar tasks: StringList = StringList()\nlet task1: String = String(\"Review proposed design\")\n\n1# Call Site A\ntasks.insert(task1)\n\n\n1\n\nCall Site A\n\n\n\n\nIn Overload 1\n\n\nThe output shows that Overload 1 was invoked.\nAt Call Site A, insert is invoked with two values. The first is the implicit value tasks of type StringList and the second is the explicit value task1 of type String. Based on the number of values, both Overload 1 and Overload 2 are candidates. Among these two, only Overload 1 matches the argument types. Consequently, the compiler resolved the call at Call Site A to Overload 1.\n\nLet’s take a look at another example:\n\n1 # Call Site B\ntasks.insert(task1, 0)\n\n\n1\n\nCall Site B\n\n\n\n\nIn Overload 2\n\n\nAt Call Site B insert is invoked with three values, of types StringList, String, and IntLiteral. This matches Overload 2. Note that the compiler implicitly converts the literal 0 from type IntLiteral to Int. We’ll discuss type conversions for call resolution in greater depth later in a later article."
   },
   {
-    "objectID": "mojo/function-overloading-in-mojo-pt1-decl.html#stringlist-declaration",
-    "href": "mojo/function-overloading-in-mojo-pt1-decl.html#stringlist-declaration",
-    "title": "Function Overloading in Mojo Pt 1 - Declaration Tests",
-    "section": "StringList declaration",
-    "text": "StringList declaration\n\nstruct StringList:\n    # Create empty list\n    # fn __init__(inout self): ...    #!!! Comented out, since there is another declaration below with identical signature\n\n    # Overload 1\n    # Insert `element` at end of list \n    fn insert(inout self, element: String):\n        print(\"In Overload 1\")\n    # Overload 2\n    # Insert `element` at `index`\n    fn insert(inout self, element: String, index: Int):\n        print(\"In Overload 2\")\n    # Overload 3\n    # Insert all `elements` at end of list\n    fn insert(inout self, elements: StringList):        \n        print(\"In Overload 3\")\n    \n    # Overload 1\n    # Create empty list\n    fn __init__(inout self):\n        print(\"In Overload 1\")\n    # Overload 2\n    # Create list initialized with `count` number of copies of `element`\n    fn __init__(inout self, element: String, count: Int):\n        print(\"In Overload 2\")\n    # Overload 3\n    # Create list initialized with strings from `elements` between `start_index` and    \n    # `end_index`\n    fn __init__(inout self,\n        elements: StringList, \n        start_index: Int, \n        end_index: Int):                                                    \n        print(\"In Overload 3\")\n    \n    # Create list initialized with strings in `elements`\n    fn __init__(inout self, *elements: String): ...\n    \n    # Each overload of `map_fold` applies mapper to all elements. Then it applies \n    #`folder` to each mapped result, passing in a running `folded` value. For the  \n    # first call to `folder`,`fold_initializer` serves as the `folded` value\n\n    # Overload 1\n    # `map_fold` for use when transformed and folded values are of `String` type\n    fn map_fold(\n        self,                                                                    \n        mapper: fn (element: String) -&gt; String,\n        fold_initializer: String,\n        folder: fn (element: String, folded: String) -&gt; String\n    ) -&gt; String:\n        print(\"In unparameterized `map_fold`\")                                 \n        return String()\n\n    # Overload 2\n    # `map_fold` for use when transformed and folded values are of the same type but\n    # other than `String`\n    fn map_fold[mapFoldType: AnyType](\n        self,\n        mapper: fn (element: String) -&gt; mapFoldType,\n        fold_initializer: mapFoldType,\n        folder: fn (mapped_element: mapFoldType, folded: mapFoldType) -&gt; mapFoldType\n    ) -&gt; mapFoldType:\n        print(\"In `map_fold` with one parameter\")\n        return fold_initializer\n\n    # Overload 3\n    # `map_fold` for use when transformed and folded values are of types different \n    # from each other\n    fn map_fold[mapType: AnyType, foldType: AnyType](\n        self,\n        mapper: fn (element: String) -&gt; mapType,\n        fold_initializer: foldType,\n        folder: fn (mapped_element: mapType, folded: foldType) -&gt; foldType\n    ) -&gt; foldType:\n        print(\"In `map_fold` with two parameters\")\n        return fold_initializer\n    \n    # Create list initialized with strings in `elements`\n    # fn __init__(inout self, *elements: String): ... #!!! Commented out because identical declaration is above\n\n    # Overlaod 1\n    # Returns all elements that are close matches to `word`\n    fn get_close_matches(self, word: String) -&gt; StringList:\n        print(\"In unparameterized `get_close_matches` with 2 arguments\")\n        return StringList()\n\n    # Overlaod 2\n    # Returns up to `max_matches` elements that are the closest matches to `word`\n    fn get_close_matches(self, word: String, max_matches: Int) -&gt; StringList:\n        print(\"In unparameterized `get_close_matches` with 3 arguments\")\n        return StringList()\n\n    # Overlaod 3\n    # Returns up to `max_matches` elements that are the closest matches to `word` by \n    # using the `matcher` to determine matches. `matcher_input` is passed to `matcher` \n    # at each invocation\n    fn get_close_matches[matchInput: AnyType, match_input: matchInput](\n        self, \n        word: String, \n        max_matches: Int, \n        matcher: fn (word: String, candidate: String, match_input: matchInput) -&gt; Bool\n    ) -&gt; StringList:\n        print(\"In parameterized `get_close_matches` with 4 arguments and 2 parameters\")\n        return StringList()"
+    "objectID": "posts/function-overloading-in-mojo-pt1/index.html#no-overloading-on-result-type",
+    "href": "posts/function-overloading-in-mojo-pt1/index.html#no-overloading-on-result-type",
+    "title": "Function Overloading in Mojo",
+    "section": "No overloading on result type",
+    "text": "No overloading on result type\nMojo functions cannot be overloaded on result type alone. Let’s look at what happens when this struct declaration is compiled:\n\nstruct StringList:\n1    # Overload 1\n    # Count all items\n    fn count(self) -&gt; UInt32: ...\n2    # Overload 2\n    # Count all items\n    fn count(self) -&gt; UInt64: ...\n\n\n1\n\nOverload 1\n\n2\n\nOverload 2\n\n\n\n\nerror: Expression [24]:8:5: redefinition of function 'count' cannot overload on return type only\n    fn count(self) -&gt; UInt64: ...   # &lt;2&gt;\n    ^\n\nExpression [24]:5:5: previous definition here\n    fn count(self) -&gt; UInt32: ...   # &lt;1&gt;\n    ^\n\nexpression failed to parse (no further compiler diagnostics)\n\n\nThe compiler generated an error. The accompanying message indicates that Overload 2 of count is not legal since Overload 1 already exists."
   },
   {
-    "objectID": "mojo/function-overloading-in-mojo-pt1-decl.html#stringlist-declaration-invocations",
-    "href": "mojo/function-overloading-in-mojo-pt1-decl.html#stringlist-declaration-invocations",
-    "title": "Function Overloading in Mojo Pt 1 - Declaration Tests",
-    "section": "StringList declaration invocations",
-    "text": "StringList declaration invocations\n\n # Call Site B\ntasks.insert(task1, 0)\n\nIn Overload 2\n\n\n\n\n\n\n\n\nNote that the next block is expected to not compile\n\n\n\n\n\n\n\nlet some_strings = StringList(\"apple\", \"two\", \"99\", \"chair\", \"41\")\n\n# Return first letter of string. If the string is empty, return empty string\nfn first_letter(string: String) -&gt; String:\n    if string:\n        return string[0]\n    else:\n        return String()\n\n# Return result of appending `string` to `append_to`\nfn append(string: String, append_to: String) -&gt; String:\n    return append_to + string\n\n\n# Returns the length of the `string`\nfn length(string: String) -&gt; Int:\n    return len(string)\n\n# Returns the shorter of `element_length` and `shortest_length`\nfn shorter(element_length: Int, shortest_length: Int) -&gt; Int:\n    if element_length &lt; shortest_length:\n        return element_length\n    else:\n        return shortest_length\n\n\nlet shortest_length = some_strings.map_fold[Int](\n    length,\n    0,\n    shorter)\n\nIn `map_fold` with one parameter\n\n\n\n# Returns `True` if `string` represents an integer\nfn is_integer(string: String) -&gt; Bool:\n    try:\n        let n = atol(string)\n\n        return True\n    except e:\n        return False\n\n# Returns count incremented by one, if `bool` is `True`\nfn inc_if_true(bool: Bool, count: Int) -&gt; Int:\n    if bool:\n        return count + 1\n    else:\n        return count\n\n\n# Call Site D\nlet number_count = some_strings.map_fold[Bool, Int](\n    is_integer,\n    0,\n    inc_if_true)\n\nIn `map_fold` with two parameters\n\n\n\n\n\n\n\n\nNote that the next block is expected to not compile\n\n\n\n\n\n\n\nlet number_count = some_strings.map_fold(\n    is_integer,\n    0,\n    inc_if_true)\n\nerror: Expression [26]:2:41: no matching function in call to 'map_fold': \nlet number_count = some_strings.map_fold(\n                   ~~~~~~~~~~~~~~~~~~~~~^\n\nExpression [7]:44:5: candidate not viable: method argument #0 cannot be converted from 'fn(string = String) -&gt; Bool' to 'fn(/, element = String) -&gt; String'\n    fn map_fold(\n    ^\n\nExpression [7]:56:5: candidate not viable: method argument #0 cannot be converted from 'fn(string = String) -&gt; Bool' to 'fn(element = String) -&gt; Int'\n    fn map_fold[mapFoldType: AnyType](\n    ^\n\nExpression [7]:68:5: candidate not viable: callee expects 2 input parameters, but 0 were specified\n    fn map_fold[mapType: AnyType, foldType: AnyType](\n    ^\n\nexpression failed to parse (no further compiler diagnostics)\n\n\n\nfn is_matching(\n    word: String, \n    candidate: String, \n    match_threshold: Float32\n) -&gt; Bool:\n    return True\n\n# Call Site C\nlet custom_similar = names.get_close_matches[Float32, 0.5](\n    \"calc\", \n    2, \n    is_matching\n)\n\nIn parameterized `get_close_matches` with 4 arguments and 2 parameters\nIn Overload 1"
+    "objectID": "posts/function-overloading-in-mojo-pt1/index.html#overloaded-constructors",
+    "href": "posts/function-overloading-in-mojo-pt1/index.html#overloaded-constructors",
+    "title": "Function Overloading in Mojo",
+    "section": "Overloaded constructors",
+    "text": "Overloaded constructors\nMojo allows constructors to be overloaded as well. For example:\n\nstruct StringList:\n1    # Overload 1\n    # Create empty list\n    fn __init__(inout self):\n        print(\"In Overload 1\")\n2    # Overload 2\n    # Create list initialized with `count` number of copies of `element`\n    fn __init__(inout self, element: String, count: Int):\n        print(\"In Overload 2\")\n3    # Overload 3\n    # Create list initialized with strings from `elements` between `start_index` and    \n    # `end_index`\n    fn __init__(inout self, elements: StringList, start_index: Int, end_index: Int):\n        print(\"In Overload 3\")\n\n\n1\n\nOverload 1\n\n2\n\nOverload 2\n\n3\n\nOverload 3\n\n\n\n\nThe argument lists of the three overloads differ by count or types, in keeping with Mojo’s overloading rules.\nHere are invocations of each of them:\n\n1# Call Site A\nlet names = StringList()\n2# Call Site B\nlet statuses = StringList(\"Pending\", 3)\n3# Call Site C\nlet copied_statuses = StringList(statuses, 1, 3)\n\n\n1\n\nCall Site A\n\n2\n\nCall Site B\n\n3\n\nCall Site C\n\n\n\n\nIn Overload 1\nIn Overload 2\nIn Overload 3\n\n\nAs we can see, the compiler resolves Call Site A, Call Site B, and Call Site C respectively to Overload 1, Overload 2, and Overload 3."
   },
   {
-    "objectID": "mojo/function-overloading-in-mojo-pt1-decl.html#swap-function-invocations",
-    "href": "mojo/function-overloading-in-mojo-pt1-decl.html#swap-function-invocations",
-    "title": "Function Overloading in Mojo Pt 1 - Declaration Tests",
-    "section": "swap function invocations",
-    "text": "swap function invocations\n\nvar i1 = 2\nvar i2 = 3\n\nprint(\"Before swap:\", i1, i2)\nswap[Int](i1, i2)\nprint(\"After swap:\", i1, i2)\n\n\nvar s1 = \"Mojo\"\nvar s2 = \"Programming\"\n\nprint(\"Before swap:\", s1, s2)\nswap[StringLiteral](s1, s2)\nprint(\"After swap:\", s1, s2)\n\nBefore swap: 2 3\nAfter swap: 3 2\nBefore swap: Mojo Programming\nAfter swap: Programming Mojo\n\n\n\nvar s1 = \"Mojo\"\nvar s2 = \"Programming\"\n\nprint(\"Before swap:\", s1, s2)\n# Call Site B\nswap(s1, s2)\nprint(\"After swap:\", s1, s2)\n\nBefore swap: Mojo Programming\nAfter swap: Programming Mojo"
+    "objectID": "posts/function-overloading-in-mojo-pt1/index.html#parameterized-functions",
+    "href": "posts/function-overloading-in-mojo-pt1/index.html#parameterized-functions",
+    "title": "Function Overloading in Mojo",
+    "section": "Parameterized functions",
+    "text": "Parameterized functions\nWhen invoked with different types, a parameterized function effectively generates overloads with a shared function name.\nConsider the simple parameterized swap function below that exchanges the referenced values:\n\n# Swap the values of `value1` and `value2`\nfn swap[valueType: Copyable](inout value1: valueType, inout value2: valueType):\n    let temp = value1\n    \n    value1 = value2\n    value2 = temp\n\nThe compiler instantiates a function based on the type of arguments. Here’s an example with Int values:\n\nvar i1 = 2\nvar i2 = 3\n\nprint(\"Before swap:\", i1, i2)\n1# Call Site A\nswap(i1, i2)\nprint(\"After swap:\", i1, i2)\n\n\n1\n\nCall Site A\n\n\n\n\nBefore swap: 2 3\nAfter swap: 3 2\n\n\n\nAnd now we use the same parameterized function with String:\n\nvar s1 = \"Mojo\"\nvar s2 = \"Programming\"\n\nprint(\"Before swap:\", s1, s2)\n1# Call Site B\nswap(s1, s2)\nprint(\"After swap:\", s1, s2)\n\n\n1\n\nCall Site B\n\n\n\n\nBefore swap: Mojo Programming\nAfter swap: Programming Mojo\n\n\n\n\n\n\n\n\n\nExplicit parameter specification\n\n\n\nNote that in swap invocations at Call Site A and Call Site B we relied on the compiler to determine the valueType parameter. An alternative is to spell out the parameter as shown below:\n\nvar i1 = 2\nvar i2 = 3\n\nprint(\"Before swap:\", i1, i2)\nswap[Int](i1, i2)\nprint(\"After swap:\", i1, i2)\n\n\nvar s1 = \"Mojo\"\nvar s2 = \"Programming\"\n\nprint(\"Before swap:\", s1, s2)\nswap[StringLiteral](s1, s2)\nprint(\"After swap:\", s1, s2)\n\nBefore swap: 2 3\nAfter swap: 3 2\nBefore swap: Mojo Programming\nAfter swap: Programming Mojo"
   },
   {
-    "objectID": "mojo/code_annotations_ipynb.html",
-    "href": "mojo/code_annotations_ipynb.html",
-    "title": "Code Annotation Hyperlinks in IPYNB",
-    "section": "",
-    "text": "1fn function_3():\n  # this is function 3\n  print(\"function 3\")\n\n2fn function_4():\n  # this is function 4\n  print(\"function 4_\")\n\n\n1\n\nAnnotation 1\n\n2\n\nAnnotation 2\n\n\n\n\nLink to Annotation 1\nLink to Annotation 2"
+    "objectID": "posts/function-overloading-in-mojo-pt1/index.html#call-resolution-1",
+    "href": "posts/function-overloading-in-mojo-pt1/index.html#call-resolution-1",
+    "title": "Function Overloading in Mojo",
+    "section": "Call resolution",
+    "text": "Call resolution\nIf the replacement_field value parameter is not used, the Mojo compiler attempts to resolve the call to Overload 1. Let’s examine the output of executing calls to format.\nOur first application of format generates a labelled username:\n\n1# Call Site A\nlet username = StringUtils.format(\"Username: {}\", \"dev#1\")\n\n\n1\n\nCall Site A\n\n\n\n\nIn Overload 1\n\n\nThe output shows that Overload 1 was invoked.\nWhile both overloads are candidates, Overload 1 is the simpler match and the one the compiler picked. We’ll dive into the compiler’s resolution rules in greater detail in a future article.\nLet’s examine another example - this time leveraging the second overload, which carries the replacement_field parameter. Consider a case in which the format_str argument has the “{}” substring embedded, however it is to be preserved; not replaced. In this example, we have a JSON object with an name/value pair where the value is the empty JSON object “{}” and needs to be preserved. So, we instead use “$$” as the replacement field:\n\n1# Call Site B\nlet empty_object = StringUtils.format[\"$$\"]('{\"$$\": {}}', \"postal_address\")\n\n\n1\n\nCall Site B\n\n\n\n\nIn Overload 2\n\n\nThe output shows that Overload 2 was invoked.\nWhile both overloads are candidates, Overload 2 is the only one that accepts a StringLiteral value parameter and the one the compiler picked.\n\n\n\n\n\n\n\nExplicit parameter specification\n\n\n\nNote that Call Site B did not explicitly pass in String as a parameter and the Mojo compiler successfully inferred the type automatically. In contrast, here is invocation with two explicit parameters:\n\nlet empty_object = StringUtils.format[\"$$\", String]('{\"$$\": {}}', \"postal_address\")\n\nIn Overload 2"
   },
   {
-    "objectID": "posts/2023-10-09-code-annotations/index.html",
-    "href": "posts/2023-10-09-code-annotations/index.html",
-    "title": "Code Annotation Hyperlinks",
-    "section": "",
-    "text": "Important\n\n\n\nThis page requires modifications from commit a07dee1f in quarto-cli fork - it modifies how code annotations are produced / handled.\n\n\nThe annotation links on this page are created with the following markdown:\n\n[Example Link](#snippet2-a4)\n\nwhich produces:\n\nExample Link\n\n\n1fn function_1():\n  # this is function 1\n  print(\"function 1\")\n\n2fn function_2():\n  # this is function 2\n  print(\"function 2\")\n\n1\n\nAnnotation 1 description\n\n2\n\nAnnotation 2 description\n\n\n\n\n\n\n\n\nNote\n\n\n\nThis is some explanatory text that references annotation 1 in the first snippet. Clicking the link should be functionally identical to clicking the relevant annotation in the code margin. This link references annotation 2 instead.\n\n\n\n\n\n\n\n\nTip\n\n\n\nOrder is unimportant - we can reference an annotation below from here.\n\n\n1fn function_3():\n  # this is function 3\n  print(\"function 3\")\n\n2fn function_4():\n  # this is function 4\n  print(\"function 4_\")\n\n3fn function_5():\n  # this is function 5\n  print(\"function 5\")\n\n4fn main():\n  function_1()\n  function_2()\n  function_3()\n  function_4()\n  function_5()\n\n1\n\nAnnotation 1 description\n\n2\n\nAnnotation 2 description\n\n3\n\nAnnotation 3 description\n\n4\n\nAnnotation 4 description\n\n\n\n\nThis aside points out annoations from both code blocks - here and here.\n\n\n\n\n\n\nNote\n\n\n\nAll annotations:\n\nSnippet 1\n\n1.1\n1.2\n\nSnippet 2\n\n2.1\n2.2\n2.3\n2.4"
+    "objectID": "posts/function-overloading-in-mojo-pt1/index.html#call-resolution-2",
+    "href": "posts/function-overloading-in-mojo-pt1/index.html#call-resolution-2",
+    "title": "Function Overloading in Mojo",
+    "section": "Call resolution",
+    "text": "Call resolution\nLet’s take a look at the output of executing some calls to format. The following generates a JSON object with one name/value pair:\n\n1# Call Site C\nlet key_value = StringUtils.format(\"format {} {}\", \"usage_count\", 6)\n\n\n1\n\nCall Site C\n\n\n\n\nIn Overload 3\n\n\nThe output indicates that Overload 3 was invoked.\nCall Site C invokes format with no ‘StringLiteral’ value parameter and three arguments. So the compiler selects Overload 3 was invoked.\nAs another example, we format a log entry with a standard format for date/time, log level, and log text.\n\n1# Call Site D\nlet log_entry = StringUtils.format(\n    \"[{}] {}: {}\", \n    \"2024-01-11T19:20:52Z\", \n    3, \n    \"File write completed.\"\n)\n\n\n1\n\nCall Site D\n\n\n\n\nIn Overload 5\n\n\nThe output demonstrates that Overload 5 was invoked.\nCall Site D invokes format without replacement_field value parameter and four arguments. Since Overload 5 is the only candidate without a StringLiteral value parameter and 4 arguments, it is the only one examined further by the compiler. The first argument is a String and the remaining of Stringable types as required by that overload. Consequently, the compiler fully resolved the call to Overload 5."
   },
   {
-    "objectID": "posts/2023-08-19-test-blog-post/index.html",
-    "href": "posts/2023-08-19-test-blog-post/index.html",
-    "title": "Test Blog Post",
-    "section": "",
-    "text": "Overloading in key languages\n\n\n\nLanguage\nMojo\nPython\nC++\n\n\n\n\nOverloading\n✓\n\n✓\n\n\n\n\n\nExample Graphviz Diagram\n\n\n\n\n\n\nG\n\n\n\nrun\n\nrun\n\n\n\nintr\n\nintr\n\n\n\nrun--intr\n\n\n\n\nkernel\n\nkernel\n\n\n\nrun--kernel\n\n\n\n\nrunbl\n\nrunbl\n\n\n\nintr--runbl\n\n\n\n\nrunbl--run\n\n\n\n\nzombie\n\nzombie\n\n\n\nkernel--zombie\n\n\n\n\nsleep\n\nsleep\n\n\n\nkernel--sleep\n\n\n\n\nrunmem\n\nrunmem\n\n\n\nkernel--runmem\n\n\n\n\nsleep--runmem\n\n\n\n\nswap\n\nswap\n\n\n\nsleep--swap\n\n\n\n\nrunswap\n\nrunswap\n\n\n\nswap--runswap\n\n\n\n\nrunswap--runmem\n\n\n\n\nnew\n\nnew\n\n\n\nrunswap--new\n\n\n\n\nnew--runmem\n\n\n\n\n\n\n\n\n\n\nExample Procedural Diagram\n\n\nCode\nimport matplotlib.pyplot as plt\nfrom matplotlib import cm\nimport numpy as np\n\nplt.style.use('_mpl-gallery')\n\nn_radii = 8\nn_angles = 36\n\n# Make radii and angles spaces\nradii = np.linspace(0.125, 1.0, n_radii)\nangles = np.linspace(0, 2*np.pi, n_angles, endpoint=False)[..., np.newaxis]\n\n# Convert polar (radii, angles) coords to cartesian (x, y) coords.\nx = np.append(0, (radii*np.cos(angles)).flatten())\ny = np.append(0, (radii*np.sin(angles)).flatten())\nz = np.sin(-x*y)\n\n# Plot\nfig, ax = plt.subplots(subplot_kw={'projection': '3d'})\nax.plot_trisurf(x, y, z, vmin=z.min() * 2, cmap=cm.Blues)\n\nax.set(xticklabels=[],\n       yticklabels=[],\n       zticklabels=[])\n\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\n\n\nCode with Annotations\n1def log(message, when=None):\n    \"\"\"Log a message with a timestamp.\n    Args:\n        message: Message to print.\n        when: datetime of when the message occurred.\n            Defaults to the present time.\n    \"\"\"\n2    if when is None:\n        when = datetime.now()\n\n    print('%s: %s' % (when, message)) \n\n1\n\nParameter when has a default value of None\n\n2\n\nThe value is computed dynamically if when is not specified by caller (or specified to be None)\n\n\n\n\nCode with Line Numbers\ndef log(message, when=None):\n    \"\"\"Log a message with a timestamp.\n    Args:\n        message: Message to print.\n        when: datetime of when the message occurred.\n            Defaults to the present time.\n    \"\"\"\n    if when is None:\n        when = datetime.now()\n\n    print('%s: %s' % (when, message)) \n\n\nCallout\n\n\n\n\n\n\nNote\n\n\n\nThis is a default callout of ‘Note’ type.\n\n\n\n\nFolded Callout\n\n\n\n\n\n\nNote\n\n\n\n\n\nThis is a callout of ‘Note’ type that is initially folded.\n\n\n\n\n\nCallout with Custom Title\n\n\n\n\n\n\nHere is a custom title!\n\n\n\nThis is a callout of ‘Note’ type that is initially folded."
+    "objectID": "posts/function-overloading-in-mojo-pt1/index.html#mojo",
+    "href": "posts/function-overloading-in-mojo-pt1/index.html#mojo",
+    "title": "Function Overloading in Mojo",
+    "section": "Mojo",
+    "text": "Mojo\n\nOfficial page for the Mojo programming language.\nOfficial documentation on function overloading on arguments in Mojo.\nOfficial documentation on function overloading on parameters in Mojo."
   },
   {
-    "objectID": "posts/2023-08-26-python-oddities/index.html",
-    "href": "posts/2023-08-26-python-oddities/index.html",
-    "title": "Python Oddities",
-    "section": "",
-    "text": "(False == False) in [False]\n\nFalse\n\n\n\nFalse == (False in [False])\n\nFalse\n\n\n\nFalse == False in [False]\n\nTrue\n\n\n\n\n\n\nfor x in range(0, 100):\n    pass\n\nprint(x)\n\n99\n\n\n\n\n\n\ndef f(arg=[]):\n    arg.append(\"value\")\n    return arg\n\nprint(f())\nprint(f())\nprint(f())\n\n['value']\n['value', 'value']\n['value', 'value', 'value']\n\n\n\n\n\n\ndef f():\n    try:\n        return \"try return\"\n    finally:\n        return \"finally return\"\n    \nprint(f())\n\nfinally return\n\n\n\n\n\n\na = 256\nb = 256\na is b\n\nTrue\n\n\n\na = 257\nb = 257\na is b\n\nFalse"
+    "objectID": "posts/function-overloading-in-mojo-pt1/index.html#function-overloading-in-c",
+    "href": "posts/function-overloading-in-mojo-pt1/index.html#function-overloading-in-c",
+    "title": "Function Overloading in Mojo",
+    "section": "Function overloading in C++",
+    "text": "Function overloading in C++\nNote that in C++ the words argument and parameter have different and overlapping meanings when compared to their meanings in Mojo. In C++, variables defined in function declaration and used within function definition are called parameters, while values used for function invocation are called arguments.\n\nOverview of function overloading in C++ and coverage of overload resolution in C++.\n\nTemplate functions in C++ are the closest feature to parameterized functions in Mojo.\n\nOverview of function templates in C++ and brief coverage of function template resolution in C++."
   },
   {
-    "objectID": "posts/2023-08-26-python-oddities/index.html#comparisons-have-equal-priority-when-chained",
-    "href": "posts/2023-08-26-python-oddities/index.html#comparisons-have-equal-priority-when-chained",
-    "title": "Python Oddities",
-    "section": "",
-    "text": "(False == False) in [False]\n\nFalse\n\n\n\nFalse == (False in [False])\n\nFalse\n\n\n\nFalse == False in [False]\n\nTrue"
+    "objectID": "posts/function-overloading-in-mojo-pt1/index.html#function-overloading-in-python",
+    "href": "posts/function-overloading-in-mojo-pt1/index.html#function-overloading-in-python",
+    "title": "Function Overloading in Mojo",
+    "section": "Function overloading in Python",
+    "text": "Function overloading in Python\nPython does not natively feature overloaded functions and compile-time call resolution. However, approximations are available.\n\nDispatch on type of first argument via functools.singledispatch.\nDispatch on types of multiple arguments via multimethod or multipledispatch."
   },
   {
-    "objectID": "posts/2023-08-26-python-oddities/index.html#function-scope-is-the-only-scope",
-    "href": "posts/2023-08-26-python-oddities/index.html#function-scope-is-the-only-scope",
-    "title": "Python Oddities",
-    "section": "",
-    "text": "for x in range(0, 100):\n    pass\n\nprint(x)\n\n99"
-  },
-  {
-    "objectID": "posts/2023-08-26-python-oddities/index.html#function-argument-default-values-are-mutable",
-    "href": "posts/2023-08-26-python-oddities/index.html#function-argument-default-values-are-mutable",
-    "title": "Python Oddities",
-    "section": "",
-    "text": "def f(arg=[]):\n    arg.append(\"value\")\n    return arg\n\nprint(f())\nprint(f())\nprint(f())\n\n['value']\n['value', 'value']\n['value', 'value', 'value']"
-  },
-  {
-    "objectID": "posts/2023-08-26-python-oddities/index.html#return-in-a-finally-will-pre-empt-return-in-a-try",
-    "href": "posts/2023-08-26-python-oddities/index.html#return-in-a-finally-will-pre-empt-return-in-a-try",
-    "title": "Python Oddities",
-    "section": "",
-    "text": "def f():\n    try:\n        return \"try return\"\n    finally:\n        return \"finally return\"\n    \nprint(f())\n\nfinally return"
-  },
-  {
-    "objectID": "posts/2023-08-26-python-oddities/index.html#integers-from--5-to-256-are-preallocated-objects",
-    "href": "posts/2023-08-26-python-oddities/index.html#integers-from--5-to-256-are-preallocated-objects",
-    "title": "Python Oddities",
-    "section": "",
-    "text": "a = 256\nb = 256\na is b\n\nTrue\n\n\n\na = 257\nb = 257\na is b\n\nFalse"
-  },
-  {
-    "objectID": "posts/2023-08-19-welcome/index.html",
-    "href": "posts/2023-08-19-welcome/index.html",
-    "title": "Welcome To My Blog",
-    "section": "",
-    "text": "This is the first post in a Quarto blog. Welcome!\n\n\n\n\n\n\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "blog",
-    "section": "",
-    "text": "Code Annotation Hyperlinks\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nStyling\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSep 3, 2023\n\n\nAlan Horne\n\n\n\n\n\n\n\n\n\n\n\n\n\nPython Oddities\n\n\n\n\n\n\n\nPython\n\n\n\n\n\n\n\n\n\n\n\nAug 26, 2023\n\n\nAlan Horne\n\n\n\n\n\n\n\n\n\n\n\n\n\nFunction Overloading in Mojo\n\n\n\n\n\n\n\nfunctions\n\n\nmethods\n\n\noverloading\n\n\n\n\n\n\n\n\n\n\n\nAug 23, 2023\n\n\nKaizen Engineering\n\n\n\n\n\n\n\n\n\n\n\n\n\nFunction Overloading in Mojo - Part 2\n\n\n\n\n\n\n\nfunctions\n\n\nmethods\n\n\noverloading\n\n\n\n\n\n\n\n\n\n\n\nAug 23, 2023\n\n\nShaival Varma\n\n\n\n\n\n\n\n\n\n\n\n\n\nFunction Overloading in Mojo - Part 3\n\n\n\n\n\n\n\nfunctions\n\n\nmethods\n\n\noverloading\n\n\n\n\n\n\n\n\n\n\n\nAug 23, 2023\n\n\nShaival Varma\n\n\n\n\n\n\n\n\n\n\n\n\n\nTest Blog Post\n\n\n\n\n\n\n\nfunctions\n\n\nmethods\n\n\noverloading\n\n\n\n\n\n\n\n\n\n\n\nAug 19, 2023\n\n\nShaival Varma\n\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nAug 19, 2023\n\n\nHarlow Malloc\n\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\n\n\nAug 16, 2023\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
+    "objectID": "posts/function-overloading-in-mojo-pt1/index.html#string-formatting-functions",
+    "href": "posts/function-overloading-in-mojo-pt1/index.html#string-formatting-functions",
+    "title": "Function Overloading in Mojo",
+    "section": "String formatting functions",
+    "text": "String formatting functions\nThese functions are available in many programming languages.\n\nString formatting in Python.\nString formatting in C++."
   },
   {
     "objectID": "about.html",
     "href": "about.html",
     "title": "about",
     "section": "",
-    "text": "Kaizen Engineering is committed to…\n\n\n\n\n\n\n\nShaival Varma\nAlan Horne\n\n\nShaival is… He has…\nAlan is… He has…\n\n\n\n \n    \n  \n    \n     contact"
+    "text": "Kaizen Engineering is dedicated to continuously refining software engineering practices to reliably and efficiently deliver results of impeccable quality.\n\n\n\n\n\n\n\nShaival Varma\nAlan Horne\n\n\nShaival pursues best practices in engineering, team organization and project management, and the powerful synergies among them.\nAlan has a keen interest in software correctness and optimization, functional programming, mathematics, and game development.\n\n\n\n \n    \n  \n    \n     contact"
   },
   {
-    "objectID": "posts/2023-09-04-styling/index.html",
-    "href": "posts/2023-09-04-styling/index.html",
-    "title": "Styling",
-    "section": "",
-    "text": "Aenean lacus metus, bibendum ut turpis sit amet, eleifend pellentesque nisi. Nunc ornare lectus vitae felis pharetra, id porttitor risus ullamcorper. Integer ac rutrum arcu. Duis quis ligula leo. Praesent tempor libero lacus, in euismod justo iaculis molestie. Aenean a laoreet mi. In hac habitasse platea dictumst. Pellentesque ut lobortis magna, vel placerat mauris. Praesent volutpat diam nibh, vel eleifend dui dapibus nec.\n\n\n\n\n\n\nNote\n\n\n\nThis is a margin ‘note’ callout in the ‘note’ tab.\nVestibulum gravida ligula mattis, commodo velit sed, eleifend est. Etiam varius elit eget faucibus interdum. Ut egestas felis in erat scelerisque viverra. Nullam sit amet ex congue, convallis lectus quis, finibus ex. Vivamus blandit lacus sed hendrerit molestie. Donec vestibulum accumsan finibus. Integer ultricies augue a neque pharetra blandit.\n\n\n\n\n\n\n\nTip\n\n\n\nThis is a margin ‘tip’ callout in the ‘tip’ tab.\nNulla quis lacus ultrices, pharetra sapien fermentum, consectetur nisi. Vivamus fermentum pulvinar sapien vitae vestibulum. Proin pretium mauris nisl, quis facilisis urna posuere a. Praesent nec dolor dignissim, iaculis arcu at, tincidunt sem. Vestibulum nisi augue, semper in tempus vel, sagittis a felis. Nunc elementum tempus metus, eget rhoncus mauris eleifend id. Fusce vitae lectus imperdiet, eleifend tortor ut, pretium sem. Integer at pellentesque lectus.\n\n\n\n\n\n\n\nWarning\n\n\n\nThis is a margin ‘warning’ callout in the ‘warning’ tab.\nPellentesque fringilla aliquet nisl eget hendrerit. Etiam in lacus eros. Nam lacinia sollicitudin neque eu eleifend. Vestibulum vulputate scelerisque nibh. Phasellus id metus ac nisi maximus feugiat et quis augue. Maecenas a risus eu eros vulputate fermentum. Aliquam tristique facilisis fringilla.\n\n\n\n\n\n\n\nCaution\n\n\n\nThis is a margin ‘caution’ callout in the ‘caution’ tab.\nPhasellus id ipsum sollicitudin, imperdiet nunc id, blandit est. Nam at rutrum quam. Nullam lobortis dolor velit, a egestas nisi ultrices eget. Donec feugiat ipsum dictum, maximus magna id, viverra risus. Morbi quis massa tincidunt, eleifend orci non, aliquet nisl. Duis gravida, eros eget semper ultricies, enim diam tempus orci, eget pretium sem ipsum ac metus. Nulla malesuada metus scelerisque urna laoreet, eget tristique ante rutrum. Integer scelerisque sapien in magna fringilla tempus. Nunc porta leo quam, nec efficitur eros accumsan vel. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec nec nulla eget erat tincidunt dapibus eget vitae turpis. Nunc eget interdum nisl. Donec nisl eros, hendrerit ut neque eget, auctor tempor ipsum. Etiam vitae leo non odio placerat consequat eget nec quam.\n\n\n\n\n\n\n\nImportant\n\n\n\nThis is a margin ‘important’ callout in the ‘important’ tab.\nVestibulum mattis ante vestibulum sodales interdum. Pellentesque imperdiet tempor quam et porttitor. Nulla lacinia interdum orci, non viverra augue. Phasellus in ultrices nisl. Curabitur hendrerit enim sit amet scelerisque tincidunt. Praesent ullamcorper rhoncus mi. Integer auctor mollis nisl a iaculis.\n\n\nNoteTipWarningCautionImportant\n\n\n\n\n\n\n\n\nNote\n\n\n\nThis is a ‘note’ callout.\nAliquam ante dolor, semper scelerisque ipsum vitae, accumsan porta ligula. Nullam ipsum leo, maximus viverra nulla et, pretium consequat ante. Sed eget sapien non arcu semper pharetra. Suspendisse varius risus sed orci iaculis sagittis. Vivamus aliquam, metus non tincidunt pellentesque, nunc purus blandit velit, et placerat lacus turpis eget arcu. Quisque nulla mi, consectetur tincidunt sem at, viverra tempor tellus. Donec pellentesque eros non hendrerit efficitur. Aenean elementum mi justo. Nam in semper libero. Fusce sed sodales diam.\n\n\n\n\n\n\n\n\n\n\n\nTip\n\n\n\nThis is a ‘tip’ callout.\nNulla dignissim sed libero id aliquet. Vestibulum ut feugiat arcu, sed dignissim est. Nulla convallis ligula ut libero consectetur, vitae finibus risus pharetra. Fusce et enim imperdiet, auctor tortor in, egestas libero. Nunc enim leo, bibendum a aliquam id, aliquam facilisis lectus. Aenean pulvinar bibendum sapien ultrices ullamcorper. Aenean eu dignissim est. Morbi nec tortor non enim aliquam ullamcorper quis eget lectus. Praesent tempus vel urna ut gravida.\n\n\n\n\n\n\n\n\n\n\n\nWarning\n\n\n\nThis is a ‘warning’ callout.\nPhasellus in mauris sit amet libero pulvinar tempus. Aenean nisi velit, vestibulum vel erat ut, tincidunt volutpat lacus. Proin in consequat velit. Nulla pretium non erat non tempus. Donec facilisis, eros at elementum mattis, erat est pharetra enim, a sagittis orci purus eget ante. Phasellus at orci et turpis sagittis placerat vitae et dui. Nunc vulputate diam eget nisl commodo molestie. Donec maximus lobortis felis vitae viverra. Integer tempus lorem quam, scelerisque sollicitudin risus tristique id.\n\n\n\n\n\n\n\n\n\n\n\nCaution\n\n\n\nThis is a ‘caution’ callout.\nCurabitur rutrum, augue ac aliquam consectetur, neque ex sodales ex, eget consectetur orci elit sed lorem. Sed feugiat auctor tortor, fermentum vulputate libero malesuada tristique. Vestibulum rhoncus egestas mi. Ut cursus sed nunc eu accumsan. Pellentesque erat justo, mollis eget nisl sit amet, elementum posuere dolor. Maecenas mollis, velit ut placerat mollis, sapien ipsum volutpat turpis, quis posuere nunc ante sed mi. Maecenas egestas magna risus, et interdum magna dignissim ac. Nulla facilisi.\n\n\n\n\n\n\n\n\n\n\n\nImportant\n\n\n\nThis is an ‘important’ callout.\nVestibulum pharetra, odio id sodales consequat, arcu leo dictum quam, ac interdum lorem lectus nec purus. Curabitur at dui ut dolor tristique condimentum sit amet vel lacus. Quisque massa orci, fermentum ac sollicitudin vitae, mollis vel mi. Duis ac posuere libero. Suspendisse bibendum sagittis risus vel tristique. Sed convallis tempus interdum. Donec sit amet urna justo. Quisque a nunc risus. Suspendisse viverra enim nec lectus varius congue. Proin id elementum massa. In at ipsum in arcu pulvinar accumsan sit amet ut felis. Integer neque erat, rhoncus vitae pretium ac, mollis eget felis. Fusce in libero leo. Vivamus gravida mattis eros et elementum.\n\n\n\n\n\n\nDuis id viverra lorem, eget aliquet lorem. Praesent vel ornare mi. Sed facilisis lorem quis ornare bibendum. Etiam erat sem, sollicitudin sed felis sed, rutrum sollicitudin eros. Donec commodo tellus nisl, eu porta purus faucibus eget. Donec sit amet lectus venenatis, efficitur ex non, venenatis ante. Aliquam gravida condimentum commodo. Praesent egestas pellentesque turpis, eget ornare odio varius nec. Morbi et massa eget dolor suscipit vulputate. Maecenas interdum ipsum vitae blandit gravida. Sed malesuada mi vehicula lacus ultrices, quis luctus nisl cursus.\n\n\nThis is div class ‘.aside’.\nFusce ligula enim, blandit nec laoreet at, dapibus eu risus. Nunc vel enim id justo fringilla ornare ac ornare lectus. Nunc arcu augue, blandit a erat in, ultrices hendrerit nulla. Mauris gravida libero sit amet massa blandit imperdiet. Fusce vel volutpat sem. Interdum et malesuada fames ac ante ipsum primis in faucibus. Etiam dictum sapien nec elementum convallis. Suspendisse finibus ut felis at interdum. Vivamus dignissim, ligula a condimentum rutrum, turpis ipsum volutpat lacus, in varius ex urna in magna. Integer ornare lobortis lacus ut viverra. Nam et nisi sagittis, venenatis nisl rutrum, pellentesque est.\nDuis quis tempus erat, ut porttitor orci. Suspendisse aliquam cursus ligula, a ullamcorper ante ornare vitae. Sed mollis ante id lorem cursus, non lacinia lacus consequat. Curabitur et nulla a nisl consequat fringilla dignissim eget augue. Quisque in sem augue. Curabitur hendrerit imperdiet diam et blandit. Cras diam arcu, rutrum pellentesque leo consectetur, dignissim commodo ante. Vestibulum in enim a ante rhoncus pharetra. Fusce vel metus tincidunt, hendrerit tellus eget, sollicitudin diam. Ut ultrices porta velit, molestie porta magna lacinia ut. Mauris vulputate aliquet consectetur. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam finibus mi a fringilla tincidunt. Sed non velit imperdiet, varius nulla quis, ultricies sapien.\n\n\nThis is div class ‘.column-margin’.\nFusce dui magna, facilisis nec est a, mollis finibus arcu. Nullam sed tellus quis elit luctus efficitur. Vivamus sagittis vel purus sed feugiat. Etiam aliquam iaculis feugiat. Suspendisse at nisl non velit aliquet interdum sed elementum urna. Mauris placerat, elit vitae elementum tempus, mi risus suscipit justo, nec feugiat mauris magna et felis. Fusce eu tincidunt magna, et semper lorem. Morbi ut felis tempor, ullamcorper tortor eget, viverra odio. In et mi in magna vestibulum tempor.\nSuspendisse venenatis augue a dignissim ornare. Maecenas tincidunt elit ipsum, non fermentum justo malesuada eu. Curabitur nec purus at nisi dictum posuere. Duis consequat elementum eros sit amet tempor. In aliquet orci nec eleifend pellentesque. Nullam a gravida elit, sed feugiat sapien. Maecenas ac pretium odio. Aenean elementum venenatis venenatis. Aliquam at aliquet arcu. Integer vitae mauris non libero feugiat tincidunt. Mauris a venenatis velit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus non justo pulvinar, scelerisque tellus vitae, sagittis leo."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html",
-    "title": "Function Overloading in Mojo",
-    "section": "",
-    "text": "Mojo allows multiple functions with the same name to coexist, provided their argument or parameter signatures are different.  Function overloading features are seen in other languages as well, such as C++.\n\nFunction overloading allows semantically similar functions to share a name, facilitates easier customization of implementations based on argument or parameter signatures, and empowers the compiler to more rigorously type check at the function call site.\n\nThis article covers Mojo syntax for function overloading. In future articles we may dive into details of overload resolution at function call site and discuss best practices for overloading.\nTo begin, let’s examine overloading via argument signatures.\n\n\n\n\n\n\nA note on code examples\n\n\n\nThe code examples in this article provide function signatures and invocations, and they typically skip implementation details. This is to maintain a focus on function overloading without distracting particulars of data structures and algorithms."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#call-resolution",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#call-resolution",
-    "title": "Function Overloading in Mojo",
-    "section": "Call resolution",
-    "text": "Call resolution\nThe Mojo compiler resolves the call at invocation site, selecting one of the overloads based on the argument list. Let’s examine the output of executing the insert call in this code:\n\nvar tasks: StringList = StringList()\nlet task1: String = String(\"Review proposed design\")\n\n1# Call Site A\ntasks.insert(task1)\n\n\n1\n\nCall Site A\n\n\n\n\nIn Overload 1\n\n\nThe output shows that Overload 1 was invoked.\nAt Call Site A, insert is invoked with two values. The first is the implicit value tasks of type StringList and the second is the explicit value task1 of type String. Based on the number of values, both Overload 1 and Overload 2 are candidates. Among these two, only Overload 1 matches the argument types. Consequently, the compiler resolved the call at Call Site A to Overload 1.\n\nLet’s take a look at another example:\n\n1 # Call Site B\ntasks.insert(task1, 0)\n\n\n1\n\nCall Site B\n\n\n\n\nIn Overload 2\n\n\nAt Call Site B insert is invoked with three values, of types StringList, String, and IntLiteral. This matches Overload 2. Note that the compiler implicitly converts the literal 0 from type IntLiteral to Int. We’ll discuss type conversions for call resolution in greater depth later in a later article."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#no-overloading-on-result-type",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#no-overloading-on-result-type",
-    "title": "Function Overloading in Mojo",
-    "section": "No overloading on result type",
-    "text": "No overloading on result type\nMojo functions cannot be overloaded on result type alone. Let’s look at what happens when this struct declaration is compiled:\n\nstruct StringList:\n1    # Overload 1\n    # Count all items\n    fn count(self) -&gt; UInt32: ...\n2    # Overload 2\n    # Count all items\n    fn count(self) -&gt; UInt64: ...\n\n\n1\n\nOverload 1\n\n2\n\nOverload 2\n\n\n\n\nerror: Expression [24]:8:5: redefinition of function 'count' cannot overload on return type only\n    fn count(self) -&gt; UInt64: ...   # &lt;2&gt;\n    ^\n\nExpression [24]:5:5: previous definition here\n    fn count(self) -&gt; UInt32: ...   # &lt;1&gt;\n    ^\n\nexpression failed to parse (no further compiler diagnostics)\n\n\nThe compiler generated an error. The accompanying message indicates that Overload 2 of count is not legal since Overload 1 already exists."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#overloaded-constructors",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#overloaded-constructors",
-    "title": "Function Overloading in Mojo",
-    "section": "Overloaded constructors",
-    "text": "Overloaded constructors\nMojo allows constructors to be overloaded as well. For example:\n\nstruct StringList:\n1    # Overload 1\n    # Create empty list\n    fn __init__(inout self):\n        print(\"In Overload 1\")\n2    # Overload 2\n    # Create list initialized with `count` number of copies of `element`\n    fn __init__(inout self, element: String, count: Int):\n        print(\"In Overload 2\")\n3    # Overload 3\n    # Create list initialized with strings from `elements` between `start_index` and    \n    # `end_index`\n    fn __init__(inout self, elements: StringList, start_index: Int, end_index: Int):\n        print(\"In Overload 3\")\n\n\n1\n\nOverload 1\n\n2\n\nOverload 2\n\n3\n\nOverload 3\n\n\n\n\nThe argument lists of the three overloads differ by count or types, in keeping with Mojo’s overloading rules.\nHere are invocations of each of them:\n\n1# Call Site A\nlet names = StringList()\n2# Call Site B\nlet statuses = StringList(\"Pending\", 3)\n3# Call Site C\nlet copied_statuses = StringList(statuses, 1, 3)\n\n\n1\n\nCall Site A\n\n2\n\nCall Site B\n\n3\n\nCall Site C\n\n\n\n\nIn Overload 1\nIn Overload 2\nIn Overload 3\n\n\nAs we can see, the compiler resolves Call Site A, Call Site B, and Call Site C respectively to Overload 1, Overload 2, and Overload 3."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#parameterized-functions",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#parameterized-functions",
-    "title": "Function Overloading in Mojo",
-    "section": "Parameterized functions",
-    "text": "Parameterized functions\nWhen invoked with different types, a parameterized function effectively generates overloads with a shared function name.\nConsider the simple parameterized swap function below that exchanges the referenced values:\n\n# Swap the values of `value1` and `value2`\nfn swap[valueType: Copyable](inout value1: valueType, inout value2: valueType):\n    let temp = value1\n    \n    value1 = value2\n    value2 = temp\n\nThe compiler instantiates a function based on the type of arguments. Here’s an example with Int values:\n\nvar i1 = 2\nvar i2 = 3\n\nprint(\"Before swap:\", i1, i2)\n# Call Site A\nswap(i1, i2)\nprint(\"After swap:\", i1, i2)\n\nBefore swap: 2 3\nAfter swap: 3 2\n\n\n\nAnd now we use the same parameterized function with String:\n\nvar s1 = \"Mojo\"\nvar s2 = \"Programming\"\n\nprint(\"Before swap:\", s1, s2)\n# Call Site B\nswap(s1, s2)\nprint(\"After swap:\", s1, s2)\n\nBefore swap: Mojo Programming\nAfter swap: Programming Mojo\n\n\n\n\n\n\n\n\n\nExplicit parameter specification\n\n\n\nNote that in swap invocations at Call Site A and Call Site B we relied on the compiler to determine the valueType parameter. An alternative is to spell out the parameter as shown below:\n\nvar i1 = 2\nvar i2 = 3\n\nprint(\"Before swap:\", i1, i2)\nswap[Int](i1, i2)\nprint(\"After swap:\", i1, i2)\n\n\nvar s1 = \"Mojo\"\nvar s2 = \"Programming\"\n\nprint(\"Before swap:\", s1, s2)\nswap[StringLiteral](s1, s2)\nprint(\"After swap:\", s1, s2)\n\nBefore swap: 2 3\nAfter swap: 3 2\nBefore swap: Mojo Programming\nAfter swap: Programming Mojo"
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#call-resolution-1",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#call-resolution-1",
-    "title": "Function Overloading in Mojo",
-    "section": "Call resolution",
-    "text": "Call resolution\nIf the replacement_field value parameter is not used, the Mojo compiler attempts to resolve the call to Overload 1. Let’s examine the output of executing calls to format.\nOur first application of format generates a labelled username:\n\n1# Call Site A\nlet username = StringUtils.format(\"Username: {}\", \"dev#1\")\n\n\n1\n\nCall Site A\n\n\n\n\nIn Overload 1\n\n\nThe output shows that Overload 1 was invoked.\nWhile both overloads are candidates, Overload 1 is the simpler match and the one the compiler picked. We’ll dive into the compiler’s resolution rules in greater detail in a future article.\nLet’s examine another example - this time leveraging the second overload, which carries the replacement_field parameter. Consider a case in which the format_str argument has the “{}” substring embedded, however it is to be preserved; not replaced. In this example, we have a JSON object with an name/value pair where the value is the empty JSON object “{}” and needs to be preserved. So, we instead use “$$” as the replacement field:\n\n1# Call Site B\nlet empty_object = StringUtils.format[\"$$\"]('{\"$$\": {}}', \"postal_address\")\n\n\n1\n\nCall Site B\n\n\n\n\nIn Overload 2\n\n\nThe output shows that Overload 2 was invoked.\nWhile both overloads are candidates, Overload 2 is the only one that accepts a StringLiteral value parameter and the one the compiler picked.\n\n\n\n\n\n\n\nExplicit parameter specification\n\n\n\nNote that Call Site B did not explicitly pass in String as a parameter and the Mojo compiler successfully inferred the type automatically. In contrast, here is invocation with two explicit parameters:\n\nlet empty_object = StringUtils.format[\"$$\", String]('{\"$$\": {}}', \"postal_address\")\n\nIn Overload 2"
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#call-resolution-2",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#call-resolution-2",
-    "title": "Function Overloading in Mojo",
-    "section": "Call resolution",
-    "text": "Call resolution\nLet’s take a look at the output of executing some calls to format. The following generates a JSON object with one name/value pair:\n\n1# Call Site C\nlet key_value = StringUtils.format(\"format {} {}\", \"usage_count\", 6)\n\n\n1\n\nCall Site C\n\n\n\n\nIn Overload 3\n\n\nThe output indicates that Overload 3 was invoked.\nCall Site C invokes format with no ‘StringLiteral’ value parameter and three arguments. So the compiler selects Overload 3 was invoked.\nAs another example, we format a log entry with a standard format for date/time, log level, and log text.\n\n1# Call Site D\nlet log_entry = StringUtils.format(\n    \"[{}] {}: {}\", \n    \"2024-01-11T19:20:52Z\", \n    3, \n    \"File write completed.\"\n)\n\n\n1\n\nCall Site D\n\n\n\n\nIn Overload 5\n\n\nThe output demonstrates that Overload 5 was invoked.\nCall Site D invokes format without replacement_field value parameter and four arguments. Since Overload 5 is the only candidate without a StringLiteral value parameter and 4 arguments, it is the only one examined further by the compiler. The first argument is a String and the remaining of Stringable types as required by that overload. Consequently, the compiler fully resolved the call to Overload 5."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#mojo",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#mojo",
-    "title": "Function Overloading in Mojo",
-    "section": "Mojo",
-    "text": "Mojo\n\nOfficial page for the Mojo programming language.\nOfficial documentation on function overloading on arguments in Mojo.\nOfficial documentation on function overloading on parameters in Mojo."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#function-overloading-in-c",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#function-overloading-in-c",
-    "title": "Function Overloading in Mojo",
-    "section": "Function overloading in C++",
-    "text": "Function overloading in C++\nNote that in C++ the words argument and parameter have different and overlapping meanings when compared to their meanings in Mojo. In C++, variables defined in function declaration and used within function definition are called parameters, while values used for function invocation are called arguments.\n\nOverview of function overloading in C++ and coverage of overload resolution in C++.\n\nTemplate functions in C++ are the closest feature to parameterized functions in Mojo.\n\nOverview of function templates in C++ and brief coverage of function template resolution in C++."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#function-overloading-in-python",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#function-overloading-in-python",
-    "title": "Function Overloading in Mojo",
-    "section": "Function overloading in Python",
-    "text": "Function overloading in Python\nPython does not natively feature overloaded functions and compile-time call resolution. However, approximations are available.\n\nDispatch on type of first argument via functools.singledispatch.\nDispatch on types of multiple arguments via multimethod or multipledispatch."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#string-formatting-functions",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt1/index.html#string-formatting-functions",
-    "title": "Function Overloading in Mojo",
-    "section": "String formatting functions",
-    "text": "String formatting functions\nThese functions are available in many programming languages.\n\nString formatting in Python.\nString formatting in C++."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt2/index.html",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt2/index.html",
-    "title": "Function Overloading in Mojo - Part 2",
-    "section": "",
-    "text": "Mojo allows multiple functions with the same name to coexist, provided their parameter signatures are different.  This function overloading feature is seen in other languages as well, such as C++.\n\nFunction overloading allows semantically similar functions to share a name, facilitates easier customization of implementations based on parameter signatures, and empowers the compiler to more rigorously type check at the function call site.\n\nThis article dives into the details of overload resolution at function call site. Part 1 covers Mojo syntax for function overloading and is good starting point for those new to this feature. Part 3 discusses best practices for overloading.\nLet’s start with a simple example.\n\n\nConsider a struct representing a list of strings: \n\nstruct StringList:\n    ..."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt2/index.html#example",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt2/index.html#example",
-    "title": "Function Overloading in Mojo - Part 2",
-    "section": "",
-    "text": "Consider a struct representing a list of strings: \n\nstruct StringList:\n    ..."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html",
-    "title": "Function Overloading in Mojo - Part 3",
-    "section": "",
-    "text": "Mojo allows multiple functions with the same name to coexist, provided their parameter signatures are different.  This function overloading feature is seen in other languages as well, such as C++.\n\nFunction overloading allows semantically similar functions to share a name, facilitates easier customization of implementations based on parameter signatures, and empowers the compiler to more rigorously type check at the function call site.\n\nThis article discusses best practices for overloading. Part 1 covers Mojo syntax for function overloading and Part 2 dives into the details of overload resolution at function call site. Part 1 is a good starting point for those new to this feature.\nLet’s start with a simple example.\n\n\nConsider a struct representing a list of strings: \n\nstruct StringList:\n    ..."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#example",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#example",
-    "title": "Function Overloading in Mojo - Part 3",
-    "section": "",
-    "text": "Consider a struct representing a list of strings: \n\nstruct StringList:\n    ..."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#semantic-consistency",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#semantic-consistency",
-    "title": "Function Overloading in Mojo - Part 3",
-    "section": "Semantic consistency",
-    "text": "Semantic consistency\nOverloads should perform the same conceptual task.\nLet’s look at functions in ‘StringList’ for shedding contained strings.\n\n\n\n\n\n\nSemantically inconsistent overloading\n\n\n\nThis code declares two overloads of remove.\n\nstruct StringList:\n    # Removes all strings\n    fn remove(inout self): ...\n    # Removes all strings for which `predicate` is true and returns them in `removed`\n    fn remove(inout self, predicate: fn (String) -&gt; Bool, inout removed: StringList): ...\n\nThe meanings of these functions are different, however. Overload 1 throws out all contained strings, while Overload 2 effectively splits the contents, storing one subset in the removed parameter.\n\n\n\n\n\n\n\n\nMeaningful unique names\n\n\n\nThis version of StringList doesn’t leverage overloading and instead provides functions with distinct names and signatures to express intent with more clarity.\n\n\nstruct StringList:\n    # Create empty list\n    fn __init__(inout self): ...                    # Overload 1\n   \n    # Create list copied from `source`\n    fn __copyinit__(inout self, source: Self): ...  # Overload 2\n\n    # Removes all strings\n    fn clear(inout self): ...\n   \n    # Removes all strings for which predicate is true and returns them\n    fn remove(inout self, predicate: fn (String) -&gt; Bool) -&gt; StringList:\n        return StringList()                       # Placeholder to satisfy compiler\n\nWhen the client uses remove, it receives a StringList object as a return value. This is simpler for the client programmer than the first version that required creation of a mutable StringList object to serve as the argument for the removed parameter. Further, the unqualified removal of all stored strings is better captured by the name clear."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#meaningful-parameter-names",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#meaningful-parameter-names",
-    "title": "Function Overloading in Mojo - Part 3",
-    "section": "Meaningful parameter names",
-    "text": "Meaningful parameter names\nA straightforward, intuitive function name serves as the initial indicator of intent. Parameter types and names, and return type are the next level of information. A client programmer should be able to quickly hone in on the best suited function, resorting to function documentation as a later step.\nSince overloaded functions share a name, the parameter list is the first discriminator among the members of that overload family. Good parameter names enable the client programmer to handily make a suitable selection from among the overloads.\nLet’s examine two variants of parameter lists for overloads of insert function below.\n\n\n\n\n\n\nUnhelpful parameter names\n\n\n\nThis code declares three overloads of insert. The documentation is omitted on purpose to put focus on the parameter lists.\n\nstruct StringList:\n    fn insert(inout self, idx: Int, e: String): ...\n    fn insert(inout self, idx: Int, l: StringList): ...\n    fn insert(inout self, idx: Int, l: StringList, sidx: Int, eidx: Int): ...\n\nDiscerning the purpose of these functions takes guesswork, especially without leaning on the parameter types.\n\n\n\n\n\n\n\n\nMeaningful parameter names\n\n\n\nIn this version, the parameter names aspire to clarify the meaning of each overload of insert.\n\nstruct StringList:\n    fn insert(inout self, at_index: Int, element: String): ...\n    fn insert(inout self, at_index: Int, elements: StringList): ...\n    fn insert(inout self, at_index: Int, elements: StringList, start_index: Int, end_index: Int): ...\n\nThese parameter names are made of full words, instead of abbreviations, and leave less to assumption. For example, at_index reads well in insert at index."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#keep-meaning-of-recurring-parameters-across-overloads-the-same",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#keep-meaning-of-recurring-parameters-across-overloads-the-same",
-    "title": "Function Overloading in Mojo - Part 3",
-    "section": "Keep meaning of recurring parameters across overloads the same",
-    "text": "Keep meaning of recurring parameters across overloads the same"
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#keep-result-type-consistent",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#keep-result-type-consistent",
-    "title": "Function Overloading in Mojo - Part 3",
-    "section": "Keep result type consistent",
-    "text": "Keep result type consistent"
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#dont-overload-on-argument-convention",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#dont-overload-on-argument-convention",
-    "title": "Function Overloading in Mojo - Part 3",
-    "section": "Don’t overload on argument convention",
-    "text": "Don’t overload on argument convention"
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#keep-recurring-parameters-across-overloads-in-same-position",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#keep-recurring-parameters-across-overloads-in-same-position",
-    "title": "Function Overloading in Mojo - Part 3",
-    "section": "Keep recurring parameters across overloads in same position",
-    "text": "Keep recurring parameters across overloads in same position\nMaintaining consistency across overloads for parameter types and their role, helps client programmers more readily work from memory. Additionally as they switch from one overload to another by revising the number of arguments, accidental misuse becomes less likely.\nLet’s take a look at a tangible example of overloaded insert function.\n\n\n\n\n\n\nInconsistent reuse of parameters across overloads\n\n\n\n\nstruct StringList:\n    # Create empty list\n    fn __init__(inout self): ...\n\n    # Insert `element` at end of list \n    fn insert(inout self, element: String): ...                         # Overload 1\n    # Insert `element` at `index` \n    fn insert(inout self, element: String, index: Int): ...             # Overload 2\n    # Insert `count` copies of `element` at `index`\n    fn insert(inout self, element: String, count: Int, index: Int): ... # Overload 3\n\n\n\nWith this declaration the client programmer is more likely to trip up when selecting or switching between Overload 2 and Overload 3. Since the index and count and parameter are both of the same type (Int), and the same position across the overloads, the compiler would not catch the crossed wires.\n\n\n\n\n\n\nConsistent reuse of parameters across overloads\n\n\n\n\nstruct StringList:\n    # Create empty list\n    fn __init__(inout self): ...\n\n    # Insert `element` at end of list \n    fn insert(inout self, element: String): ...                         # Overload 1\n    # Insert `element` at `index` \n    fn insert(inout self, element: String, index: Int): ...             # Overload 2\n    # Insert `count` copies of `element` at `index`\n    fn insert(inout self, element: String, index: Int, count: Int): ... # Overload 3\n\nThis version maintains the same position for the index parameter across Overload 2 and Overload 3. The consistency enables the client programmer to employ and transition between the overloads with reduced likelihood of misstepping."
-  },
-  {
-    "objectID": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#overloading-vs.-default-parameter-values",
-    "href": "posts/2023-08-24-function-overloading-in-mojo-pt3/index.html#overloading-vs.-default-parameter-values",
-    "title": "Function Overloading in Mojo - Part 3",
-    "section": "Overloading vs. default parameter values",
-    "text": "Overloading vs. default parameter values"
-  },
-  {
-    "objectID": "posts/2023-08-19-post-with-code/index.html",
-    "href": "posts/2023-08-19-post-with-code/index.html",
-    "title": "Post With Code",
-    "section": "",
-    "text": "This is a post with executable code."
-  },
-  {
-    "objectID": "mojo/code_annotations_qmd.html",
-    "href": "mojo/code_annotations_qmd.html",
-    "title": "Code Annotation Hyperlinks in QMD",
-    "section": "",
-    "text": "1fn function_3():\n  # this is function 3\n  print(\"function 3\")\n\n2fn function_4():\n  # this is function 4\n  print(\"function 4_\")\n\n1\n\nAnnotation 1\n\n2\n\nAnnotation 2\n\n\nLink to Annotation 1\nLink to Annotation 2"
-  },
-  {
-    "objectID": "nbs/index.html",
-    "href": "nbs/index.html",
+    "objectID": "index.html",
+    "href": "index.html",
     "title": "blog",
     "section": "",
-    "text": "::: {#cell-1 .cell 0=‘h’ 1=‘i’ 2=‘d’ 3=‘e’}\n:::\nThis file will become your README and also the index of your documentation."
-  },
-  {
-    "objectID": "nbs/index.html#install",
-    "href": "nbs/index.html#install",
-    "title": "blog",
-    "section": "Install",
-    "text": "Install\npip install blog"
-  },
-  {
-    "objectID": "nbs/index.html#how-to-use",
-    "href": "nbs/index.html#how-to-use",
-    "title": "blog",
-    "section": "How to use",
-    "text": "How to use\nFill me in please! Don’t forget code examples:\n\n1+1\n\n2"
+    "text": "Function Overloading in Mojo\n\n\n\n\n\n\n\nfunctions\n\n\nmethods\n\n\noverloading\n\n\n\n\n\n\n\n\n\n\n\nJan 26, 2024\n\n\nKaizen Engineering\n\n\n\n\n\n\nNo matching items"
   }
 ]

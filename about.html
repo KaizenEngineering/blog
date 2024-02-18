@@ -151,7 +151,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="quarto-title-meta">
   </div>
 </header> <div id="kaizen-engineering-heading">
-<p>Kaizen Engineering is committed to…</p>
+<p>Kaizen Engineering is dedicated to continuously refining software engineering practices to reliably and efficiently deliver results of impeccable quality.</p>
 <table class="table">
 <colgroup>
 <col style="width: 51%">
@@ -163,8 +163,8 @@ ul.task-list li input[type="checkbox"] {
 <td style="text-align: center;"><strong>Alan Horne</strong></td>
 </tr>
 <tr class="even">
-<td style="text-align: center;">Shaival is… He has…</td>
-<td style="text-align: center;">Alan is… He has…</td>
+<td style="text-align: center;">Shaival pursues best practices in engineering, team organization and project management, and the powerful synergies among them.</td>
+<td style="text-align: center;">Alan has a keen interest in software correctness and optimization, functional programming, mathematics, and game development.</td>
 </tr>
 </tbody>
 </table>
@@ -255,30 +255,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       changeGiscusTheme();
     }
   }
-  const toggleUtterancesIfUsed = (isAlternate, darkModeDefault) => {
-    const baseTheme = document.querySelector('#utterances-base-theme')?.value ?? 'github-light';
-    const alternateTheme = document.querySelector('#utterances-alt-theme')?.value ?? 'github-dark';
-    let newTheme = '';
-    if(darkModeDefault) {
-      newTheme = isAlternate ? baseTheme : alternateTheme;
-    } else {
-      newTheme = isAlternate ? alternateTheme : baseTheme;
-    }
-    const changeUtterancesTheme = () => {
-      if (document.querySelector('iframe.utterances-frame')) {
-        const message = {
-          type: 'set-theme',
-          theme: newTheme
-        };
-        const iframe = document.querySelector('iframe.utterances-frame');
-        iframe.contentWindow.postMessage(message, 'https://utteranc.es');
-      }
-    }
-    const isUtterancesLoaded = window.document.querySelector('iframe.utterances-frame') !== null;
-    if (isUtterancesLoaded) {
-      changeUtterancesTheme();
-    }
-  }
   const toggleColorMode = (alternate) => {
     // Switch the stylesheets
     const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
@@ -354,7 +330,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     toggleColorMode(toAlternate);
     setStyleSentinel(toAlternate);
     toggleGiscusIfUsed(toAlternate, darkModeDefault);
-    toggleUtterancesIfUsed(toAlternate, darkModeDefault);
   };
   // Ensure there is a toggle, if there isn't float one in the top right
   if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
@@ -740,10 +715,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<script src="https://utteranc.es/client.js" repo="KaizenEngineering/blog" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
-</script>
-<input type="hidden" id="utterances-base-theme" value="github-light">
-<input type="hidden" id="utterances-alt-theme" value="github-dark">
 </div> <!-- /content -->
 
 
